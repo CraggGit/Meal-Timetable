@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Special meal planner</title>
+<style>
+  :root {
+    --paper: #f4f6f1;
+    --ink: #1b2a24;
+    --muted: #5d6b64;
+    --pine: #1f4d3a;
+    --pine-soft: #dfe9e2;
+    --cran: #a8223a;
+    --line: #c5d0c9;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 20px 16px 64px; }
+  h1 { font: 700 30px/1.15 Georgia, "Times New Roman", serif; margin: 8px 0 4px; color: var(--pine); }
+  h2 { font: 700 20px/1.2 Georgia, serif; margin: 0 0 12px; }
+  p.lede { margin: 0 0 20px; color: var(--muted); }
+  section { margin-bottom: 28px; }
+  label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  input, select {
+    width: 100%; font: inherit; padding: 10px 12px; border: 1.5px solid var(--line);
+    border-radius: 8px; background: var(--white); color: var(--ink);
+  }
+  input:focus, select:focus, button:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--pine); outline-offset: 2px;
+  }
+  .row { display: flex; gap: 12px; margin-bottom: 14px; }
+  .row > div { flex: 1; min-width: 0; }
+  .row > .narrow { flex: 0 0 96px; }
+  .summary { background: var(--pine-soft); border-radius: 8px; padding: 12px 14px; font-size: 15px; }
+  .summary strong { color: var(--pine); }
+  ol.timeline { list-style: none; margin: 0; padding: 0; }
+  ol.timeline li {
+    display: grid; grid-template-columns: 64px 1fr; gap: 0 14px;
+    position: relative; padding-bottom: 16px;
+  }
+  ol.timeline li::before {
+    content: ""; position: absolute; left: 71px; top: 12px; bottom: -4px; width: 2px; background: var(--line);
+  }
+  ol.timeline li:last-child::before { display: none; }
+  .time { font: 700 22px/1.2 Georgia, serif; text-align: right; padding-top: 1px; font-variant-numeric: tabular-nums; }
+  .day { display: block; font: 500 12px/1.2 system-ui, sans-serif; color: var(--muted); }
+  .task { position: relative; padding-left: 18px; }
+  .task::before {
+    content: ""; position: absolute; left: -7px; top: 7px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--pine); border: 3px solid var(--paper);
+  }
+  .task b { display: block; font-weight: 600; }
+  .task small { display: block; color: var(--muted); white-space: pre-line; }
+  li.serve .time, li.serve .task b { color: var(--cran); }
+  li.serve .task::before { background: var(--cran); }
+  li.key .task b { color: var(--pine); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  button {
+    font: inherit; font-weight: 600; padding: 12px 16px; border-radius: 8px; cursor: pointer;
+    border: 1.5px solid var(--pine); background: var(--white); color: var(--pine);
+  }
+  button.primary { background: var(--pine); color: var(--white); flex: 1 1 100%; }
+  button.small { padding: 6px 10px; font-size: 14px; }
+  button.danger { border-color: var(--line); color: var(--cran); }
+  details { border: 1.5px solid var(--line); border-radius: 8px; background: var(--white); padding: 0 14px; }
+  summary { padding: 14px 0; font-weight: 600; cursor: pointer; }
+  details[open] summary { border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .edit-row { display: grid; grid-template-columns: 1fr 76px auto; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .edit-row.two { grid-template-columns: 1fr 76px; }
+  textarea { width: 100%; font: inherit; font-size: 14px; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: 8px;
+    background: var(--white); color: var(--ink); resize: vertical; min-height: 44px; margin-bottom: 10px; }
+  textarea:focus { outline: 3px solid var(--pine); outline-offset: 2px; }
+  .check { display: flex; align-items: center; gap: 10px; font-weight: 500; margin: 6px 0 0; }
+  .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--pine); }
+  .edit-row.two span { font-size: 15px; }
+  .edit-head { font: 700 15px/1.3 Georgia, serif; margin: 14px 0 6px; color: var(--pine); }
+  .group-title { font-weight: 600; font-size: 14px; margin: 14px 0 6px; color: var(--muted); }
+  .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .chip { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; margin: 0;
+    border: 1.5px solid var(--line); border-radius: 8px; background: var(--white); font-weight: 500; font-size: 15px; cursor: pointer; }
+  .chip input { width: 18px; height: 18px; margin: 0; flex: none; accent-color: var(--pine); }
+  .chip:has(input:checked) { background: var(--pine-soft); border-color: var(--pine); }
+  .chip:has(input:focus-visible) { outline: 3px solid var(--pine); outline-offset: 2px; }
+  .hint { font-size: 14px; color: var(--muted); margin: 0 0 14px; }
+  .howto { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: #fff;
+    padding: 10px 16px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .toast.show { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+  @media print { .actions, details, .howto, .noprint { display: none; } body { background: #fff; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Special meal planner</h1>
+  <p class="lede">Pick your main, enter its weight and when you want to eat. You get a timeline, and can add every step to your phone calendar with an alert.</p>
+
+  <section class="noprint" aria-labelledby="h-setup">
+    <h2 id="h-setup">Your meal</h2>
+    <div class="row">
+      <div>
+        <label for="preset">Main dish</label>
+        <select id="preset"></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="dish">Name on the timeline</label>
+        <input id="dish" type="text" value="Turkey">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="weight">Weight</label>
+        <input id="weight" type="number" inputmode="decimal" min="0.5" step="0.1" value="5.5">
+      </div>
+      <div class="narrow">
+        <label for="unit">Unit</label>
+        <select id="unit"><option value="kg">kg</option><option value="lb">lb</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="serve">Eating time</label>
+        <input id="serve" type="datetime-local">
+      </div>
+    </div>
+    <div class="summary" id="summary" aria-live="polite"></div>
+    <p class="hint" id="temp" style="margin-top:8px"></p>
+  </section>
+
+  <section class="noprint" aria-labelledby="h-veg">
+    <h2 id="h-veg">Vegetables and sides</h2>
+    <p class="hint">Tick what you're making. Each one adds its steps to the timeline.</p>
+    <div id="sides"></div>
+  </section>
+
+  <section aria-labelledby="h-plan">
+    <h2 id="h-plan">Your timeline</h2>
+    <ol class="timeline" id="timeline"></ol>
+    <div class="actions">
+      <button class="primary" id="btn-ics">Add to calendar with alerts</button>
+      <button id="btn-copy">Copy checklist</button>
+      <button id="btn-print">Print</button>
+    </div>
+    <p class="howto">The calendar file opens in Apple, Google or Outlook Calendar. Each step becomes an event with its own alert, so your phone reminds you even when locked.</p>
+    <div class="row noprint" style="margin-top:14px">
+      <div>
+        <label for="lead">Alert me</label>
+        <select id="lead">
+          <option value="0">At the time</option>
+          <option value="5" selected>5 minutes before</option>
+          <option value="10">10 minutes before</option>
+          <option value="15">15 minutes before</option>
+        </select>
+        <label class="check"><input type="checkbox" id="notetitle"> Show notes in the alert title too</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="noprint">
+    <details>
+      <summary>Change timings and add steps</summary>
+      <p class="hint">These are guide times for the dish you picked. Cooking time = minutes per kg × weight + extra minutes. Rest is how long it stays covered before carving. Set minutes per kg to 0 for a fixed cooking time.</p>
+      <div class="row">
+        <div><label for="perkg">Mins per kg</label><input id="perkg" type="number" inputmode="numeric" value="20"></div>
+        <div><label for="extra">Extra mins</label><input id="extra" type="number" inputmode="numeric" value="70"></div>
+        <div><label for="rest">Rest mins</label><input id="rest" type="number" inputmode="numeric" value="45"></div>
+      </div>
+      <p class="hint">Notes for the main dish. They show under "into the oven" and appear in the calendar event.</p>
+      <textarea id="mainnote" rows="2" placeholder="e.g. Butter under the skin, bacon over the breast"></textarea>
+      <p class="hint">Steps for your chosen sides: minutes before eating, and a note for each.</p>
+      <div id="editor"></div>
+      <button class="small" id="btn-add">Add your own step</button>
+      <p class="hint" style="margin-top:14px">Timings are a guide. Always check with a thermometer before serving.</p>
+    </details>
+  </section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+  // Sides and extras. Each step happens a set number of minutes before eating. {dish} becomes the main dish name.
+  const SIDES = [
+    { group: "Vegetables", items: [
+      { id: "roasties", name: "Roast potatoes", on: true, steps: [
+        { name: "Peel and parboil the potatoes", mins: 100 }, { name: "Roast potatoes into the hot oven", mins: 60 } ] },
+      { id: "parsnips", name: "Roast parsnips", on: true, steps: [ { name: "Parsnips into the oven", mins: 45 } ] },
+      { id: "roastcarrots", name: "Roast carrots", steps: [ { name: "Carrots into the oven", mins: 45 } ] },
+      { id: "sprouts", name: "Brussels sprouts", on: true, steps: [ { name: "Sprouts on to cook", mins: 12 } ] },
+      { id: "carrots", name: "Boiled carrots", steps: [ { name: "Carrots on to boil", mins: 15 } ] },
+      { id: "broccoli", name: "Broccoli", steps: [ { name: "Broccoli on to steam", mins: 8 } ] },
+      { id: "peas", name: "Peas or green beans", steps: [ { name: "Peas or beans on to cook", mins: 6 } ] },
+      { id: "cabbage", name: "Red cabbage", steps: [ { name: "Red cabbage on to braise", mins: 120 } ] },
+      { id: "cauli", name: "Cauliflower cheese", steps: [
+        { name: "Make the cauliflower cheese", mins: 75 }, { name: "Cauliflower cheese into the oven", mins: 30 } ] },
+      { id: "mash", name: "Mashed potato", steps: [
+        { name: "Mash potatoes on to boil", mins: 35 }, { name: "Mash with butter and keep warm", mins: 10 } ] },
+    ]},
+    { group: "Sides", items: [
+      { id: "stuffing", name: "Stuffing", on: true, steps: [ { name: "Stuffing into the oven", mins: 35 } ] },
+      { id: "pigs", name: "Pigs in blankets", on: true, steps: [ { name: "Pigs in blankets into the oven", mins: 35 } ] },
+      { id: "yorkies", name: "Yorkshire puddings", steps: [
+        { name: "Put the tin and fat in to heat", mins: 25 }, { name: "Yorkshire pudding batter into the tin", mins: 20 } ] },
+      { id: "breadsauce", name: "Bread sauce", steps: [ { name: "Make the bread sauce", mins: 30 } ] },
+    ]},
+    { group: "Finishing", items: [
+      { id: "gravy", name: "Gravy", on: true, steps: [ { name: "Make the gravy", mins: 20 } ] },
+      { id: "plates", name: "Warm the plates", on: true, steps: [ { name: "Warm the plates", mins: 15 } ] },
+      { id: "carve", name: "Carve or portion", on: true, steps: [ { name: "Carve or portion the {dish}", mins: 10 } ] },
+    ]},
+  ];
+  // Starter notes. Edit them in the page.
+  const NOTES = {
+    "Peel and parboil the potatoes": "Boil 8 to 10 minutes, drain, shake in the pan to roughen the edges.\nPut the fat in the tin to heat.",
+    "Roast potatoes into the hot oven": "Fat should sizzle when they go in. Turn once halfway.",
+    "Parsnips into the oven": "Toss in oil and season. Turn once.",
+    "Sprouts on to cook": "Boil 5 to 7 minutes. Drain well.",
+    "Red cabbage on to braise": "Cook gently with apple, vinegar and spices. Stir now and then.",
+    "Put the tin and fat in to heat": "Fat must be smoking hot before the batter goes in.",
+    "Make the gravy": "Use the tray juices. Skim off the fat.",
+  };
+  SIDES.forEach(g => g.items.forEach(side => side.steps.forEach(st => { st.note = NOTES[st.name] || ""; })));
+  const customs = []; // your own extra steps
+
+  // Guide timings (UK-style). perkg = minutes per kg, extra = fixed minutes, rest = resting minutes.
+  const PRESETS = [
+    { id: "turkey",  label: "Turkey (whole)",       dish: "Turkey",       w: 5.5, perkg: 20, extra: 70, rest: 45, temp: "Check the thickest part of the thigh reaches 75 °C and the juices run clear." },
+    { id: "crown",   label: "Turkey crown",         dish: "Turkey crown", w: 2.5, perkg: 20, extra: 20, rest: 30, temp: "Check the thickest part reaches 75 °C and the juices run clear." },
+    { id: "goose",   label: "Goose",                dish: "Goose",        w: 4.5, perkg: 33, extra: 15, rest: 30, temp: "Check the thickest part of the thigh reaches 75 °C. Pour off the fat during cooking." },
+    { id: "chicken", label: "Chicken (whole)",      dish: "Chicken",      w: 1.8, perkg: 40, extra: 20, rest: 15, temp: "Check the thickest part of the thigh reaches 75 °C and the juices run clear." },
+    { id: "beefr",   label: "Beef joint, rare",     dish: "Beef",         w: 2,   perkg: 44, extra: 20, rest: 30, temp: "Core temperature about 50 to 52 °C for rare." },
+    { id: "beefm",   label: "Beef joint, medium",   dish: "Beef",         w: 2,   perkg: 55, extra: 25, rest: 30, temp: "Core temperature about 60 °C for medium." },
+    { id: "beefw",   label: "Beef joint, well done",dish: "Beef",         w: 2,   perkg: 66, extra: 30, rest: 30, temp: "Core temperature 70 °C or above for well done." },
+    { id: "lamb",    label: "Leg of lamb, medium",  dish: "Lamb",         w: 2.2, perkg: 55, extra: 25, rest: 30, temp: "Core temperature about 60 °C for medium." },
+    { id: "pork",    label: "Roast pork joint",     dish: "Pork",         w: 2,   perkg: 70, extra: 35, rest: 25, temp: "Core temperature at least 70 °C, and the juices should run clear." },
+    { id: "salmon",  label: "Whole salmon or side", dish: "Salmon",       w: 2,   perkg: 15, extra: 15, rest: 10, temp: "Flesh should flake easily and be opaque, about 60 °C at the thickest point." },
+    { id: "nut",     label: "Nut roast (fixed time)", dish: "Nut roast",  w: 1,   perkg: 0,  extra: 60, rest: 10, temp: "Check it is piping hot all the way through." },
+    { id: "custom",  label: "Something else",       dish: "Main",         w: 2,   perkg: 30, extra: 30, rest: 20, temp: "Check it is cooked through before serving." },
+  ];
+
+  const $ = id => document.getElementById(id);
+  const pad = n => String(n).padStart(2, "0");
+  const fmtTime = d => pad(d.getHours()) + ":" + pad(d.getMinutes());
+  const fmtDay = d => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+  const sameDay = (a, b) => a.toDateString() === b.toDateString();
+  const roundMin = n => Math.round(n);
+
+  function num(id, fallback) {
+    const v = parseFloat($(id).value);
+    return isFinite(v) ? v : fallback;
+  }
+
+  function dishMinutes() {
+    let kg = num("weight", 0);
+    if ($("unit").value === "lb") kg = kg * 0.45359237;
+    const perkg = num("perkg", 0), extra = num("extra", 0);
+    if (perkg > 0 && kg <= 0) return { kg: 0, cook: 0 };
+    return { kg, cook: roundMin(kg * perkg + extra), fixed: perkg <= 0 };
+  }
+
+  function dishName() { return ($("dish").value || "").trim() || "Main"; }
+
+  function applyPreset() {
+    const p = PRESETS.find(x => x.id === $("preset").value);
+    if (!p) return;
+    $("dish").value = p.dish;
+    $("perkg").value = p.perkg;
+    $("extra").value = p.extra;
+    $("rest").value = p.rest;
+    if ($("unit").value === "lb") $("weight").value = (p.w / 0.45359237).toFixed(1);
+    else $("weight").value = p.w;
+    render();
+  }
+
+  function buildPlan() {
+    const serve = new Date($("serve").value);
+    if (isNaN(serve)) return null;
+    const { kg, cook, fixed } = dishMinutes();
+    const dish = dishName();
+    const rest = Math.max(0, num("rest", 45));
+    const items = [];
+    if (cook > 0) {
+      items.push({ name: dish + " into the oven", note: "Cooks for " + fmtDur(cook) + (($("mainnote").value || "").trim() ? "\n" + $("mainnote").value.trim() : ""), before: cook + rest, key: true });
+      items.push({ name: dish + " out to rest", note: "Cover loosely with foil. Turn the oven up for the roasties.", before: rest, key: true });
+    }
+    SIDES.forEach(g => g.items.forEach(side => {
+      if (!side.on) return;
+      side.steps.forEach(st => items.push({ name: st.name.replace("{dish}", dish.toLowerCase()), note: st.note, before: Number(st.mins) || 0 }));
+    }));
+    customs.forEach(t => items.push({ name: t.name, note: t.note, before: Number(t.mins) || 0 }));
+    items.push({ name: "Time to eat", before: 0, serve: true });
+    items.sort((a, b) => b.before - a.before);
+    items.forEach(i => { i.when = new Date(serve.getTime() - i.before * 60000); });
+    return { serve, items, kg, cook, rest, fixed, dish };
+  }
+
+  function esc2(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  function fmtDur(m) {
+    const h = Math.floor(m / 60), r = m % 60;
+    return (h ? h + " hr " : "") + (r ? r + " min" : "").trim();
+  }
+
+  function render() {
+    const plan = buildPlan();
+    const tl = $("timeline"), sm = $("summary");
+    tl.innerHTML = "";
+    if (!plan) { sm.textContent = "Choose an eating time to see your plan."; return; }
+    if (plan.cook > 0) {
+      const inOven = new Date(plan.serve.getTime() - (plan.cook + plan.rest) * 60000);
+      const what = plan.fixed ? "<strong>" + esc2(plan.dish) + "</strong>" : "A <strong>" + plan.kg.toFixed(1) + " kg</strong> " + esc2(plan.dish.toLowerCase());
+      sm.innerHTML = what + " needs <strong>" + fmtDur(plan.cook) +
+        "</strong> plus " + plan.rest + " min resting. Into the oven at <strong>" + fmtTime(inOven) + "</strong>.";
+    } else {
+      sm.textContent = "Enter a weight to include the main dish.";
+    }
+    const p = PRESETS.find(x => x.id === $("preset").value);
+    $("temp").textContent = p ? p.temp : "";
+    plan.items.forEach(i => {
+      const li = document.createElement("li");
+      if (i.serve) li.className = "serve"; else if (i.key) li.className = "key";
+      const t = document.createElement("div");
+      t.className = "time";
+      t.textContent = fmtTime(i.when);
+      if (!sameDay(i.when, plan.serve)) {
+        const d = document.createElement("span"); d.className = "day"; d.textContent = fmtDay(i.when); t.appendChild(d);
+      }
+      const k = document.createElement("div");
+      k.className = "task";
+      const b = document.createElement("b"); b.textContent = i.name; k.appendChild(b);
+      if (i.note) { const s = document.createElement("small"); s.textContent = i.note; k.appendChild(s); }
+      li.appendChild(t); li.appendChild(k); tl.appendChild(li);
+    });
+  }
+
+  // Chips for choosing vegetables and sides
+  function renderSides() {
+    const host = $("sides");
+    host.innerHTML = "";
+    SIDES.forEach(g => {
+      const t = document.createElement("div"); t.className = "group-title"; t.textContent = g.group; host.appendChild(t);
+      const grid = document.createElement("div"); grid.className = "chips";
+      g.items.forEach(side => {
+        const l = document.createElement("label"); l.className = "chip";
+        const c = document.createElement("input"); c.type = "checkbox"; c.checked = !!side.on;
+        c.addEventListener("change", () => { side.on = c.checked; renderEditor(); render(); });
+        l.append(c, document.createTextNode(side.name)); grid.appendChild(l);
+      });
+      host.appendChild(grid);
+    });
+  }
+
+  // Editor for step timings
+  function renderEditor() {
+    const ed = $("editor");
+    ed.innerHTML = "";
+    SIDES.forEach(g => g.items.forEach(side => {
+      if (!side.on) return;
+      const h = document.createElement("div"); h.className = "edit-head"; h.textContent = side.name; ed.appendChild(h);
+      side.steps.forEach(st => {
+        const row = document.createElement("div"); row.className = "edit-row two";
+        const lab = document.createElement("span"); lab.textContent = st.name.replace("{dish}", dishName().toLowerCase());
+        const m = document.createElement("input"); m.type = "number"; m.inputMode = "numeric"; m.value = st.mins;
+        m.setAttribute("aria-label", st.name + ": minutes before eating");
+        m.addEventListener("input", () => { st.mins = m.value; render(); });
+        row.append(lab, m); ed.appendChild(row);
+        const ta = document.createElement("textarea"); ta.rows = 2; ta.value = st.note || "";
+        ta.placeholder = "Note (optional)"; ta.setAttribute("aria-label", "Note for " + st.name);
+        ta.addEventListener("input", () => { st.note = ta.value; render(); });
+        ed.appendChild(ta);
+      });
+    }));
+    if (customs.length) { const h = document.createElement("div"); h.className = "edit-head"; h.textContent = "Your own steps"; ed.appendChild(h); }
+    customs.forEach((t, idx) => {
+      const row = document.createElement("div"); row.className = "edit-row";
+      const n = document.createElement("input"); n.type = "text"; n.value = t.name; n.setAttribute("aria-label", "Step name");
+      n.addEventListener("input", () => { t.name = n.value; render(); });
+      const m = document.createElement("input"); m.type = "number"; m.inputMode = "numeric"; m.value = t.mins; m.setAttribute("aria-label", "Minutes before eating");
+      m.addEventListener("input", () => { t.mins = m.value; render(); });
+      const x = document.createElement("button"); x.className = "small danger"; x.textContent = "Remove"; x.setAttribute("aria-label", "Remove " + t.name);
+      x.addEventListener("click", () => { customs.splice(idx, 1); renderEditor(); render(); });
+      row.append(n, m, x); ed.appendChild(row);
+      const ta = document.createElement("textarea"); ta.rows = 2; ta.value = t.note || "";
+      ta.placeholder = "Note (optional)"; ta.setAttribute("aria-label", "Note for " + t.name);
+      ta.addEventListener("input", () => { t.note = ta.value; render(); });
+      ed.appendChild(ta);
+    });
+  }
+
+  function toast(msg) {
+    const t = $("toast"); t.textContent = msg; t.classList.add("show");
+    clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  // Calendar export (.ics). Times are "floating" so they use the phone's own time zone.
+  function icsDate(d) {
+    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00";
+  }
+  const esc = s => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+
+  function downloadIcs() {
+    const plan = buildPlan();
+    if (!plan) { toast("Choose an eating time first"); return; }
+    const lead = parseInt($("lead").value, 10) || 0;
+    const inTitle = $("notetitle").checked;
+    const flat = n => (n || "").replace(/\s*\n\s*/g, ". ").trim();
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Special meal planner//EN", "CALSCALE:GREGORIAN"];
+    plan.items.forEach((i, idx) => {
+      const end = new Date(i.when.getTime() + 5 * 60000);
+      lines.push(
+        "BEGIN:VEVENT",
+        "UID:meal-" + icsDate(plan.serve) + "-" + idx + "@meal-planner",
+        "DTSTAMP:" + stamp,
+        "DTSTART:" + icsDate(i.when),
+        "DTEND:" + icsDate(end),
+        "SUMMARY:" + esc("Meal: " + i.name + (inTitle && flat(i.note) ? " - " + flat(i.note) : "")),
+        "DESCRIPTION:" + esc(i.note || ""),
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        "DESCRIPTION:" + esc(i.name + (flat(i.note) ? " - " + flat(i.note) : "")),
+        "TRIGGER:-PT" + lead + "M",
+        "END:VALARM",
+        "END:VEVENT"
+      );
+    });
+    lines.push("END:VCALENDAR");
+    const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "meal-plan.ics";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast("Calendar file ready. Open it to add the events.");
+  }
+
+  function checklistText() {
+    const plan = buildPlan();
+    if (!plan) return "";
+    return "Meal plan\n" + plan.items.map(i => fmtTime(i.when) + "  " + i.name + ((i.note || "").trim() ? "\n       " + i.note.trim().replace(/\n/g, "\n       ") : "")).join("\n");
+  }
+
+  async function copyChecklist() {
+    const text = checklistText();
+    if (!text) { toast("Choose an eating time first"); return; }
+    try {
+      if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) { await navigator.share({ text }); return; }
+      await navigator.clipboard.writeText(text);
+      toast("Checklist copied");
+    } catch (e) { toast("Couldn't copy. Try Print instead."); }
+  }
+
+  ["weight", "unit", "serve", "perkg", "extra", "rest", "dish", "mainnote"].forEach(id => {
+    $(id).addEventListener("input", render);
+    $(id).addEventListener("change", render);
+  });
+  $("btn-ics").addEventListener("click", downloadIcs);
+  $("btn-copy").addEventListener("click", copyChecklist);
+  $("btn-print").addEventListener("click", () => window.print());
+  $("btn-add").addEventListener("click", () => { customs.push({ name: "New step", mins: 30, note: "" }); renderEditor(); render(); });
+
+  // Setup
+  const sel = $("preset");
+  PRESETS.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.label; sel.appendChild(o); });
+  sel.addEventListener("change", applyPreset);
+  $("unit").addEventListener("change", () => {
+    const w = parseFloat($("weight").value);
+    if (isFinite(w)) $("weight").value = ($("unit").value === "lb" ? w / 0.45359237 : w * 0.45359237).toFixed(1);
+    render();
+  });
+  // Default eating time: tomorrow at 18:00 (local)
+  const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(18, 0, 0, 0);
+  $("serve").value = t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()) + "T18:00";
+
+  renderSides();
+  applyPreset();
+  renderEditor();
+</script>
+</body>
+</html>
