@@ -21,7 +21,11 @@
     font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   }
   main { max-width: 640px; margin: 0 auto; padding: 20px 16px 64px; }
-  h1 { font: 700 30px/1.15 Georgia, "Times New Roman", serif; margin: 8px 0 4px; color: var(--pine); }
+  .hero { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .hero .art { flex: none; width: 92px; height: 92px; }
+  .hero .art svg { width: 100%; height: 100%; display: block; }
+  .hero p.lede { margin-bottom: 0; }
+  h1 { font: 700 28px/1.15 Georgia, "Times New Roman", serif; margin: 4px 0 4px; color: var(--pine); overflow-wrap: anywhere; }
   h2 { font: 700 20px/1.2 Georgia, serif; margin: 0 0 12px; }
   p.lede { margin: 0 0 20px; color: var(--muted); }
   section { margin-bottom: 28px; }
@@ -70,13 +74,32 @@
   details { border: 1.5px solid var(--line); border-radius: 8px; background: var(--white); padding: 0 14px; }
   summary { padding: 14px 0; font-weight: 600; cursor: pointer; }
   details[open] summary { border-bottom: 1px solid var(--line); margin-bottom: 14px; }
-  .edit-row { display: grid; grid-template-columns: 1fr 76px auto; gap: 8px; margin-bottom: 8px; align-items: center; }
-  .edit-row.two { grid-template-columns: 1fr 76px; }
+  .edit-row { display: grid; grid-template-columns: 1fr 92px auto; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .edit-row.two { grid-template-columns: 1fr 92px; }
+  .edit-row.three { grid-template-columns: 1fr 78px 78px; }
+  .edit-row.three span { font-size: 15px; }
+  .unit-field { position: relative; }
+  .unit-field input { padding-right: 34px; }
+  .unit-field .unit { position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    font-size: 12px; color: var(--muted); pointer-events: none; }
+  li.heat .time, li.heat .task b { color: #8a4b00; }
+  li.heat .task::before { background: #c27a12; }
   textarea { width: 100%; font: inherit; font-size: 14px; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: 8px;
     background: var(--white); color: var(--ink); resize: vertical; min-height: 44px; margin-bottom: 10px; }
   textarea:focus { outline: 3px solid var(--pine); outline-offset: 2px; }
   .check { display: flex; align-items: center; gap: 10px; font-weight: 500; margin: 6px 0 0; }
   .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--pine); }
+  .recipe { margin-top: 4px; }
+  .recipe summary { padding: 4px 0; font: 600 13px system-ui, sans-serif; color: var(--pine); cursor: pointer; list-style: none; }
+  .recipe summary::-webkit-details-marker { display: none; }
+  .recipe summary::before { content: "\1F4D6  "; }
+  .recipe[open] summary::before { content: "\1F4D6  "; }
+  .recipe div { white-space: pre-line; font-size: 14px; color: var(--ink); background: var(--white); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px; margin-top: 2px; }
+  .qty { font-weight: 400; color: var(--muted); }
+  .suggest { display: flex; align-items: center; gap: 10px; margin: -6px 0 14px; }
+  .suggest span { font-size: 14px; color: var(--muted); }
+  .suggest button { padding: 6px 10px; font-size: 13px; }
   .edit-row.two span { font-size: 15px; }
   .edit-head { font: 700 15px/1.3 Georgia, serif; margin: 14px 0 6px; color: var(--pine); }
   .group-title { font-weight: 600; font-size: 14px; margin: 14px 0 6px; color: var(--muted); }
@@ -97,11 +120,38 @@
 </head>
 <body>
 <main>
-  <h1>Special meal planner</h1>
-  <p class="lede">Pick your main, enter its weight and when you want to eat. You get a timeline, and can add every step to your phone calendar with an alert.</p>
+  <header class="hero">
+    <div class="art" id="art" aria-hidden="true"></div>
+    <div>
+      <h1 id="title">Special meal planner</h1>
+      <p class="lede">Pick your main, enter its weight and when you want to eat. You get a timeline, and can add every step to your phone calendar with an alert.</p>
+    </div>
+  </header>
+
+  <section class="noprint" aria-labelledby="h-occ" style="margin-top:20px">
+    <h2 id="h-occ">The occasion</h2>
+    <div class="row">
+      <div>
+        <label for="occasion">What are you celebrating?</label>
+        <select id="occasion"></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="occname">Title (optional)</label>
+        <input id="occname" type="text" placeholder="e.g. Emma's 40th birthday">
+      </div>
+    </div>
+  </section>
 
   <section class="noprint" aria-labelledby="h-setup">
     <h2 id="h-setup">Your meal</h2>
+    <div class="row">
+      <div>
+        <label for="people">Number of people</label>
+        <input id="people" type="number" inputmode="numeric" min="1" step="1" value="8">
+      </div>
+    </div>
     <div class="row">
       <div>
         <label for="preset">Main dish</label>
@@ -124,6 +174,7 @@
         <select id="unit"><option value="kg">kg</option><option value="lb">lb</option></select>
       </div>
     </div>
+    <p class="suggest" id="suggestwrap"><span id="suggesttext"></span> <button type="button" class="small" id="btn-suggest">Use this</button></p>
     <div class="row">
       <div>
         <label for="serve">Eating time</label>
@@ -159,6 +210,7 @@
           <option value="15">15 minutes before</option>
         </select>
         <label class="check"><input type="checkbox" id="notetitle"> Show notes in the alert title too</label>
+        <label class="check"><input type="checkbox" id="ovenrem" checked> Include oven pre-heat reminders</label>
       </div>
     </div>
   </section>
@@ -168,13 +220,20 @@
       <summary>Change timings and add steps</summary>
       <p class="hint">These are guide times for the dish you picked. Cooking time = minutes per kg × weight + extra minutes. Rest is how long it stays covered before carving. Set minutes per kg to 0 for a fixed cooking time.</p>
       <div class="row">
-        <div><label for="perkg">Mins per kg</label><input id="perkg" type="number" inputmode="numeric" value="20"></div>
-        <div><label for="extra">Extra mins</label><input id="extra" type="number" inputmode="numeric" value="70"></div>
-        <div><label for="rest">Rest mins</label><input id="rest" type="number" inputmode="numeric" value="45"></div>
+        <div><label for="perkg">Mins per kg</label><div class="unit-field"><input id="perkg" type="number" inputmode="numeric" value="20"><span class="unit">min</span></div></div>
+        <div><label for="extra">Extra mins</label><div class="unit-field"><input id="extra" type="number" inputmode="numeric" value="70"><span class="unit">min</span></div></div>
+        <div><label for="rest">Rest mins</label><div class="unit-field"><input id="rest" type="number" inputmode="numeric" value="45"><span class="unit">min</span></div></div>
       </div>
+      <div class="row">
+        <div><label for="ovenc">Main dish oven</label><div class="unit-field"><input id="ovenc" type="number" inputmode="numeric" value="180"><span class="unit">°C</span></div></div>
+        <div><label for="warm">Oven warm-up</label><div class="unit-field"><input id="warm" type="number" inputmode="numeric" value="15"><span class="unit">min</span></div></div>
+      </div>
+      <p class="hint">Oven temperatures are for a fan oven. Adjust for your own oven.</p>
       <p class="hint">Notes for the main dish. They show under "into the oven" and appear in the calendar event.</p>
       <textarea id="mainnote" rows="2" placeholder="e.g. Butter under the skin, bacon over the breast"></textarea>
-      <p class="hint">Steps for your chosen sides: minutes before eating, and a note for each.</p>
+      <label for="mainrecipe">Recipe (optional, shows with the "into the oven" step)</label>
+      <textarea id="mainrecipe" rows="4" placeholder="Ingredients and method..."></textarea>
+      <p class="hint">Steps for your chosen sides: minutes before eating, oven °C (leave blank if it is not in the oven), and a note for each.</p>
       <div id="editor"></div>
       <button class="small" id="btn-add">Add your own step</button>
       <p class="hint" style="margin-top:14px">Timings are a guide. Always check with a thermometer before serving.</p>
@@ -185,31 +244,32 @@
 
 <script>
   // Sides and extras. Each step happens a set number of minutes before eating. {dish} becomes the main dish name.
+  // per: guide quantity per person - {amt, unit, label}. unit "" = whole items, "g" grams, "ml" millilitres.
   const SIDES = [
     { group: "Vegetables", items: [
-      { id: "roasties", name: "Roast potatoes", on: true, steps: [
+      { id: "roasties", name: "Roast potatoes", on: true, per: { amt: 200, unit: "g", label: "potatoes" }, steps: [
         { name: "Peel and parboil the potatoes", mins: 100 }, { name: "Roast potatoes into the hot oven", mins: 60 } ] },
-      { id: "parsnips", name: "Roast parsnips", on: true, steps: [ { name: "Parsnips into the oven", mins: 45 } ] },
-      { id: "roastcarrots", name: "Roast carrots", steps: [ { name: "Carrots into the oven", mins: 45 } ] },
-      { id: "sprouts", name: "Brussels sprouts", on: true, steps: [ { name: "Sprouts on to cook", mins: 12 } ] },
-      { id: "carrots", name: "Boiled carrots", steps: [ { name: "Carrots on to boil", mins: 15 } ] },
-      { id: "broccoli", name: "Broccoli", steps: [ { name: "Broccoli on to steam", mins: 8 } ] },
-      { id: "peas", name: "Peas or green beans", steps: [ { name: "Peas or beans on to cook", mins: 6 } ] },
-      { id: "cabbage", name: "Red cabbage", steps: [ { name: "Red cabbage on to braise", mins: 120 } ] },
-      { id: "cauli", name: "Cauliflower cheese", steps: [
+      { id: "parsnips", name: "Roast parsnips", on: true, per: { amt: 100, unit: "g", label: "parsnips" }, steps: [ { name: "Parsnips into the oven", mins: 45 } ] },
+      { id: "roastcarrots", name: "Roast carrots", per: { amt: 100, unit: "g", label: "carrots" }, steps: [ { name: "Carrots into the oven", mins: 45 } ] },
+      { id: "sprouts", name: "Brussels sprouts", on: true, per: { amt: 100, unit: "g", label: "sprouts" }, steps: [ { name: "Sprouts on to cook", mins: 12 } ] },
+      { id: "carrots", name: "Boiled carrots", per: { amt: 100, unit: "g", label: "carrots" }, steps: [ { name: "Carrots on to boil", mins: 15 } ] },
+      { id: "broccoli", name: "Broccoli", per: { amt: 80, unit: "g", label: "broccoli" }, steps: [ { name: "Broccoli on to steam", mins: 8 } ] },
+      { id: "peas", name: "Peas or green beans", per: { amt: 60, unit: "g", label: "peas or beans" }, steps: [ { name: "Peas or beans on to cook", mins: 6 } ] },
+      { id: "cabbage", name: "Red cabbage", per: { amt: 100, unit: "g", label: "red cabbage" }, steps: [ { name: "Red cabbage on to braise", mins: 120 } ] },
+      { id: "cauli", name: "Cauliflower cheese", per: { amt: 150, unit: "g", label: "cauliflower" }, steps: [
         { name: "Make the cauliflower cheese", mins: 75 }, { name: "Cauliflower cheese into the oven", mins: 30 } ] },
-      { id: "mash", name: "Mashed potato", steps: [
+      { id: "mash", name: "Mashed potato", per: { amt: 200, unit: "g", label: "potatoes" }, steps: [
         { name: "Mash potatoes on to boil", mins: 35 }, { name: "Mash with butter and keep warm", mins: 10 } ] },
     ]},
     { group: "Sides", items: [
-      { id: "stuffing", name: "Stuffing", on: true, steps: [ { name: "Stuffing into the oven", mins: 35 } ] },
-      { id: "pigs", name: "Pigs in blankets", on: true, steps: [ { name: "Pigs in blankets into the oven", mins: 35 } ] },
-      { id: "yorkies", name: "Yorkshire puddings", steps: [
+      { id: "stuffing", name: "Stuffing", on: true, per: { amt: 100, unit: "g", label: "stuffing" }, steps: [ { name: "Stuffing into the oven", mins: 35 } ] },
+      { id: "pigs", name: "Pigs in blankets", on: true, per: { amt: 2, unit: "", label: "pigs in blankets" }, steps: [ { name: "Pigs in blankets into the oven", mins: 35 } ] },
+      { id: "yorkies", name: "Yorkshire puddings", per: { amt: 2, unit: "", label: "Yorkshire puddings" }, steps: [
         { name: "Put the tin and fat in to heat", mins: 25 }, { name: "Yorkshire pudding batter into the tin", mins: 20 } ] },
-      { id: "breadsauce", name: "Bread sauce", steps: [ { name: "Make the bread sauce", mins: 30 } ] },
+      { id: "breadsauce", name: "Bread sauce", per: { amt: 50, unit: "g", label: "bread sauce" }, steps: [ { name: "Make the bread sauce", mins: 30 } ] },
     ]},
     { group: "Finishing", items: [
-      { id: "gravy", name: "Gravy", on: true, steps: [ { name: "Make the gravy", mins: 20 } ] },
+      { id: "gravy", name: "Gravy", on: true, per: { amt: 60, unit: "ml", label: "gravy" }, steps: [ { name: "Make the gravy", mins: 20 } ] },
       { id: "plates", name: "Warm the plates", on: true, steps: [ { name: "Warm the plates", mins: 15 } ] },
       { id: "carve", name: "Carve or portion", on: true, steps: [ { name: "Carve or portion the {dish}", mins: 10 } ] },
     ]},
@@ -224,23 +284,29 @@
     "Put the tin and fat in to heat": "Fat must be smoking hot before the batter goes in.",
     "Make the gravy": "Use the tray juices. Skim off the fat.",
   };
-  SIDES.forEach(g => g.items.forEach(side => side.steps.forEach(st => { st.note = NOTES[st.name] || ""; })));
+  SIDES.forEach(g => g.items.forEach(side => side.steps.forEach(st => { st.note = NOTES[st.name] || ""; st.recipe = ""; })));
+  const OVENS = {
+    "Roast potatoes into the hot oven": 200, "Parsnips into the oven": 200, "Carrots into the oven": 200,
+    "Cauliflower cheese into the oven": 200, "Stuffing into the oven": 200, "Pigs in blankets into the oven": 200,
+    "Put the tin and fat in to heat": 220,
+  };
+  SIDES.forEach(g => g.items.forEach(side => side.steps.forEach(st => { st.oven = OVENS[st.name] || ""; })));
   const customs = []; // your own extra steps
 
   // Guide timings (UK-style). perkg = minutes per kg, extra = fixed minutes, rest = resting minutes.
   const PRESETS = [
-    { id: "turkey",  label: "Turkey (whole)",       dish: "Turkey",       w: 5.5, perkg: 20, extra: 70, rest: 45, temp: "Check the thickest part of the thigh reaches 75 °C and the juices run clear." },
-    { id: "crown",   label: "Turkey crown",         dish: "Turkey crown", w: 2.5, perkg: 20, extra: 20, rest: 30, temp: "Check the thickest part reaches 75 °C and the juices run clear." },
-    { id: "goose",   label: "Goose",                dish: "Goose",        w: 4.5, perkg: 33, extra: 15, rest: 30, temp: "Check the thickest part of the thigh reaches 75 °C. Pour off the fat during cooking." },
-    { id: "chicken", label: "Chicken (whole)",      dish: "Chicken",      w: 1.8, perkg: 40, extra: 20, rest: 15, temp: "Check the thickest part of the thigh reaches 75 °C and the juices run clear." },
-    { id: "beefr",   label: "Beef joint, rare",     dish: "Beef",         w: 2,   perkg: 44, extra: 20, rest: 30, temp: "Core temperature about 50 to 52 °C for rare." },
-    { id: "beefm",   label: "Beef joint, medium",   dish: "Beef",         w: 2,   perkg: 55, extra: 25, rest: 30, temp: "Core temperature about 60 °C for medium." },
-    { id: "beefw",   label: "Beef joint, well done",dish: "Beef",         w: 2,   perkg: 66, extra: 30, rest: 30, temp: "Core temperature 70 °C or above for well done." },
-    { id: "lamb",    label: "Leg of lamb, medium",  dish: "Lamb",         w: 2.2, perkg: 55, extra: 25, rest: 30, temp: "Core temperature about 60 °C for medium." },
-    { id: "pork",    label: "Roast pork joint",     dish: "Pork",         w: 2,   perkg: 70, extra: 35, rest: 25, temp: "Core temperature at least 70 °C, and the juices should run clear." },
-    { id: "salmon",  label: "Whole salmon or side", dish: "Salmon",       w: 2,   perkg: 15, extra: 15, rest: 10, temp: "Flesh should flake easily and be opaque, about 60 °C at the thickest point." },
-    { id: "nut",     label: "Nut roast (fixed time)", dish: "Nut roast",  w: 1,   perkg: 0,  extra: 60, rest: 10, temp: "Check it is piping hot all the way through." },
-    { id: "custom",  label: "Something else",       dish: "Main",         w: 2,   perkg: 30, extra: 30, rest: 20, temp: "Check it is cooked through before serving." },
+    { id: "turkey",  label: "Turkey (whole)",       dish: "Turkey",       w: 5.5, perkg: 20, extra: 70, rest: 45, oven: 180, per: 0.45, temp: "Check the thickest part of the thigh reaches 75 °C and the juices run clear." },
+    { id: "crown",   label: "Turkey crown",         dish: "Turkey crown", w: 2.5, perkg: 20, extra: 20, rest: 30, oven: 180, per: 0.4, temp: "Check the thickest part reaches 75 °C and the juices run clear." },
+    { id: "goose",   label: "Goose",                dish: "Goose",        w: 4.5, perkg: 33, extra: 15, rest: 30, oven: 180, per: 0.55, temp: "Check the thickest part of the thigh reaches 75 °C. Pour off the fat during cooking." },
+    { id: "chicken", label: "Chicken (whole)",      dish: "Chicken",      w: 1.8, perkg: 40, extra: 20, rest: 15, oven: 190, per: 0.35, temp: "Check the thickest part of the thigh reaches 75 °C and the juices run clear." },
+    { id: "beefr",   label: "Beef joint, rare",     dish: "Beef",         w: 2,   perkg: 44, extra: 20, rest: 30, oven: 200, per: 0.3, temp: "Core temperature about 50 to 52 °C for rare." },
+    { id: "beefm",   label: "Beef joint, medium",   dish: "Beef",         w: 2,   perkg: 55, extra: 25, rest: 30, oven: 200, per: 0.3, temp: "Core temperature about 60 °C for medium." },
+    { id: "beefw",   label: "Beef joint, well done",dish: "Beef",         w: 2,   perkg: 66, extra: 30, rest: 30, oven: 190, per: 0.3, temp: "Core temperature 70 °C or above for well done." },
+    { id: "lamb",    label: "Leg of lamb, medium",  dish: "Lamb",         w: 2.2, perkg: 55, extra: 25, rest: 30, oven: 190, per: 0.35, temp: "Core temperature about 60 °C for medium." },
+    { id: "pork",    label: "Roast pork joint",     dish: "Pork",         w: 2,   perkg: 70, extra: 35, rest: 25, oven: 180, per: 0.35, temp: "Core temperature at least 70 °C, and the juices should run clear." },
+    { id: "salmon",  label: "Whole salmon or side", dish: "Salmon",       w: 2,   perkg: 15, extra: 15, rest: 10, oven: 180, per: 0.2, temp: "Flesh should flake easily and be opaque, about 60 °C at the thickest point." },
+    { id: "nut",     label: "Nut roast (fixed time)", dish: "Nut roast",  w: 1,   perkg: 0,  extra: 60, rest: 10, oven: 180, per: 0.25, temp: "Check it is piping hot all the way through." },
+    { id: "custom",  label: "Something else",       dish: "Main",         w: 2,   perkg: 30, extra: 30, rest: 20, oven: 180, per: 0.3, temp: "Check it is cooked through before serving." },
   ];
 
   const $ = id => document.getElementById(id);
@@ -272,8 +338,10 @@
     $("perkg").value = p.perkg;
     $("extra").value = p.extra;
     $("rest").value = p.rest;
+    $("ovenc").value = p.oven;
     if ($("unit").value === "lb") $("weight").value = (p.w / 0.45359237).toFixed(1);
     else $("weight").value = p.w;
+    updateSuggest();
     render();
   }
 
@@ -285,15 +353,25 @@
     const rest = Math.max(0, num("rest", 45));
     const items = [];
     if (cook > 0) {
-      items.push({ name: dish + " into the oven", note: "Cooks for " + fmtDur(cook) + (($("mainnote").value || "").trim() ? "\n" + $("mainnote").value.trim() : ""), before: cook + rest, key: true });
+      items.push({ name: dish + " into the oven", note: "Cooks for " + fmtDur(cook) + (($("mainnote").value || "").trim() ? "\n" + $("mainnote").value.trim() : ""), recipe: ($("mainrecipe").value || "").trim(), oven: Number($("ovenc").value) || 0, before: cook + rest, key: true });
       items.push({ name: dish + " out to rest", note: "Cover loosely with foil. Turn the oven up for the roasties.", before: rest, key: true });
     }
     SIDES.forEach(g => g.items.forEach(side => {
       if (!side.on) return;
-      side.steps.forEach(st => items.push({ name: st.name.replace("{dish}", dish.toLowerCase()), note: st.note, before: Number(st.mins) || 0 }));
+      side.steps.forEach(st => items.push({ name: st.name.replace("{dish}", dish.toLowerCase()), note: st.note, recipe: st.recipe || "", oven: Number(st.oven) || 0, before: Number(st.mins) || 0 }));
     }));
-    customs.forEach(t => items.push({ name: t.name, note: t.note, before: Number(t.mins) || 0 }));
+    customs.forEach(t => items.push({ name: t.name, note: t.note, recipe: t.recipe || "", before: Number(t.mins) || 0 }));
     items.push({ name: "Time to eat", before: 0, serve: true });
+    if ($("ovenrem").checked) {
+      const warm = Math.max(0, num("warm", 15));
+      let cur = null;
+      items.filter(i => i.oven > 0).sort((a, b) => b.before - a.before).forEach(i => {
+        if (i.oven === cur) return;
+        const verb = cur === null ? "Turn the oven on to " : (i.oven > cur ? "Turn the oven up to " : "Turn the oven down to ");
+        items.push({ name: verb + i.oven + "\u00B0C", note: "Ready for: " + i.name.charAt(0).toLowerCase() + i.name.slice(1), before: i.before + warm, heat: true });
+        cur = i.oven;
+      });
+    }
     items.sort((a, b) => b.before - a.before);
     items.forEach(i => { i.when = new Date(serve.getTime() - i.before * 60000); });
     return { serve, items, kg, cook, rest, fixed, dish };
@@ -301,9 +379,28 @@
 
   function esc2(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
+  function unitWrap(input, unit) {
+    const wrap = document.createElement("div"); wrap.className = "unit-field";
+    wrap.appendChild(input);
+    const u = document.createElement("span"); u.className = "unit"; u.textContent = unit;
+    wrap.appendChild(u);
+    return wrap;
+  }
+
+  function people() { return Math.max(1, Math.round(num("people", 8))); }
+
+  function qtyFor(per) {
+    if (!per) return "";
+    const total = per.amt * people();
+    if (per.unit === "g" && total >= 1000) return (total / 1000).toFixed(total >= 10000 ? 0 : 1) + " kg " + per.label;
+    if (per.unit === "ml" && total >= 1000) return (total / 1000).toFixed(total >= 10000 ? 0 : 1) + " L " + per.label;
+    if (per.unit === "") return Math.round(total) + " " + per.label;
+    return Math.round(total) + per.unit + " " + per.label;
+  }
+
   function fmtDur(m) {
     const h = Math.floor(m / 60), r = m % 60;
-    return (h ? h + " hr " : "") + (r ? r + " min" : "").trim();
+    return ((h ? h + " hr " : "") + (r ? r + " min" : "")).trim();
   }
 
   function render() {
@@ -323,7 +420,7 @@
     $("temp").textContent = p ? p.temp : "";
     plan.items.forEach(i => {
       const li = document.createElement("li");
-      if (i.serve) li.className = "serve"; else if (i.key) li.className = "key";
+      if (i.serve) li.className = "serve"; else if (i.heat) li.className = "heat"; else if (i.key) li.className = "key";
       const t = document.createElement("div");
       t.className = "time";
       t.textContent = fmtTime(i.when);
@@ -334,6 +431,12 @@
       k.className = "task";
       const b = document.createElement("b"); b.textContent = i.name; k.appendChild(b);
       if (i.note) { const s = document.createElement("small"); s.textContent = i.note; k.appendChild(s); }
+      if (i.recipe) {
+        const det = document.createElement("details"); det.className = "recipe";
+        const sum = document.createElement("summary"); sum.textContent = "Recipe"; det.appendChild(sum);
+        const div = document.createElement("div"); div.textContent = i.recipe; det.appendChild(div);
+        k.appendChild(det);
+      }
       li.appendChild(t); li.appendChild(k); tl.appendChild(li);
     });
   }
@@ -349,7 +452,13 @@
         const l = document.createElement("label"); l.className = "chip";
         const c = document.createElement("input"); c.type = "checkbox"; c.checked = !!side.on;
         c.addEventListener("change", () => { side.on = c.checked; renderEditor(); render(); });
-        l.append(c, document.createTextNode(side.name)); grid.appendChild(l);
+        const nameSpan = document.createElement("span"); nameSpan.textContent = side.name;
+        l.append(c, nameSpan);
+        if (side.per) {
+          const q = document.createElement("span"); q.className = "qty"; q.textContent = " (" + qtyFor(side.per) + ")";
+          q.dataset.qty = side.id; l.appendChild(q);
+        }
+        grid.appendChild(l);
       });
       host.appendChild(grid);
     });
@@ -363,16 +472,23 @@
       if (!side.on) return;
       const h = document.createElement("div"); h.className = "edit-head"; h.textContent = side.name; ed.appendChild(h);
       side.steps.forEach(st => {
-        const row = document.createElement("div"); row.className = "edit-row two";
+        const row = document.createElement("div"); row.className = "edit-row three";
         const lab = document.createElement("span"); lab.textContent = st.name.replace("{dish}", dishName().toLowerCase());
         const m = document.createElement("input"); m.type = "number"; m.inputMode = "numeric"; m.value = st.mins;
         m.setAttribute("aria-label", st.name + ": minutes before eating");
         m.addEventListener("input", () => { st.mins = m.value; render(); });
-        row.append(lab, m); ed.appendChild(row);
+        const o = document.createElement("input"); o.type = "number"; o.inputMode = "numeric"; o.value = st.oven || "";
+        o.setAttribute("aria-label", st.name + ": oven temperature in degrees C, blank if not in the oven");
+        o.addEventListener("input", () => { st.oven = o.value; render(); });
+        row.append(lab, unitWrap(m, "min"), unitWrap(o, "\u00B0C")); ed.appendChild(row);
         const ta = document.createElement("textarea"); ta.rows = 2; ta.value = st.note || "";
         ta.placeholder = "Note (optional)"; ta.setAttribute("aria-label", "Note for " + st.name);
         ta.addEventListener("input", () => { st.note = ta.value; render(); });
         ed.appendChild(ta);
+        const ra = document.createElement("textarea"); ra.rows = 3; ra.value = st.recipe || "";
+        ra.placeholder = "Recipe (optional)"; ra.setAttribute("aria-label", "Recipe for " + st.name);
+        ra.addEventListener("input", () => { st.recipe = ra.value; render(); });
+        ed.appendChild(ra);
       });
     }));
     if (customs.length) { const h = document.createElement("div"); h.className = "edit-head"; h.textContent = "Your own steps"; ed.appendChild(h); }
@@ -384,11 +500,15 @@
       m.addEventListener("input", () => { t.mins = m.value; render(); });
       const x = document.createElement("button"); x.className = "small danger"; x.textContent = "Remove"; x.setAttribute("aria-label", "Remove " + t.name);
       x.addEventListener("click", () => { customs.splice(idx, 1); renderEditor(); render(); });
-      row.append(n, m, x); ed.appendChild(row);
+      row.append(n, unitWrap(m, "min"), x); ed.appendChild(row);
       const ta = document.createElement("textarea"); ta.rows = 2; ta.value = t.note || "";
       ta.placeholder = "Note (optional)"; ta.setAttribute("aria-label", "Note for " + t.name);
       ta.addEventListener("input", () => { t.note = ta.value; render(); });
       ed.appendChild(ta);
+      const ra = document.createElement("textarea"); ra.rows = 3; ra.value = t.recipe || "";
+      ra.placeholder = "Recipe (optional)"; ra.setAttribute("aria-label", "Recipe for " + t.name);
+      ra.addEventListener("input", () => { t.recipe = ra.value; render(); });
+      ed.appendChild(ra);
     });
   }
 
@@ -419,8 +539,8 @@
         "DTSTAMP:" + stamp,
         "DTSTART:" + icsDate(i.when),
         "DTEND:" + icsDate(end),
-        "SUMMARY:" + esc("Meal: " + i.name + (inTitle && flat(i.note) ? " - " + flat(i.note) : "")),
-        "DESCRIPTION:" + esc(i.note || ""),
+        "SUMMARY:" + esc(mealTitle() + ": " + i.name + (inTitle && flat(i.note) ? " - " + flat(i.note) : "")),
+        "DESCRIPTION:" + esc((i.note || "") + (i.recipe ? (i.note ? "\n\nRecipe:\n" : "Recipe:\n") + i.recipe : "")),
         "BEGIN:VALARM",
         "ACTION:DISPLAY",
         "DESCRIPTION:" + esc(i.name + (flat(i.note) ? " - " + flat(i.note) : "")),
@@ -442,7 +562,10 @@
   function checklistText() {
     const plan = buildPlan();
     if (!plan) return "";
-    return "Meal plan\n" + plan.items.map(i => fmtTime(i.when) + "  " + i.name + ((i.note || "").trim() ? "\n       " + i.note.trim().replace(/\n/g, "\n       ") : "")).join("\n");
+    return mealTitle() + " plan\n" + plan.items.map(i => fmtTime(i.when) + "  " + i.name
+      + ((i.note || "").trim() ? "\n       " + i.note.trim().replace(/\n/g, "\n       ") : "")
+      + ((i.recipe || "").trim() ? "\n       Recipe: " + i.recipe.trim().replace(/\n/g, "\n       ") : "")
+    ).join("\n");
   }
 
   async function copyChecklist() {
@@ -455,16 +578,80 @@
     } catch (e) { toast("Couldn't copy. Try Print instead."); }
   }
 
-  ["weight", "unit", "serve", "perkg", "extra", "rest", "dish", "mainnote"].forEach(id => {
+  ["weight", "unit", "serve", "perkg", "extra", "rest", "dish", "mainnote", "mainrecipe", "ovenc", "warm", "ovenrem"].forEach(id => {
     $(id).addEventListener("input", render);
     $(id).addEventListener("change", render);
+  });
+  $("people").addEventListener("input", () => { updateQuantities(); updateSuggest(); render(); });
+  $("unit").addEventListener("change", updateSuggest);
+  $("btn-suggest").addEventListener("click", () => {
+    const kg = parseFloat($("btn-suggest").dataset.kg || "0");
+    if (!kg) return;
+    $("weight").value = ($("unit").value === "lb" ? kg / 0.45359237 : kg).toFixed(1);
+    render();
   });
   $("btn-ics").addEventListener("click", downloadIcs);
   $("btn-copy").addEventListener("click", copyChecklist);
   $("btn-print").addEventListener("click", () => window.print());
-  $("btn-add").addEventListener("click", () => { customs.push({ name: "New step", mins: 30, note: "" }); renderEditor(); render(); });
+  $("btn-add").addEventListener("click", () => { customs.push({ name: "New step", mins: 30, note: "", recipe: "" }); renderEditor(); render(); });
+
+  // Occasions: title, colour theme and a drawn picture for each.
+  const ART = {
+    santa: `<svg viewBox="0 0 120 120"><path d="M20 58C20 100 44 114 60 114S100 100 100 58Z" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><ellipse cx="60" cy="58" rx="30" ry="24" fill="#f6c9a8"/><path d="M24 48C22 16 58 4 84 16 98 24 94 42 96 48Z" fill="#c62828"/><rect x="20" y="40" width="80" height="15" rx="7.5" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><circle cx="90" cy="14" r="9" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><circle cx="48" cy="60" r="3.2" fill="#222"/><circle cx="72" cy="60" r="3.2" fill="#222"/><circle cx="40" cy="68" r="5" fill="#ef9a9a" opacity=".7"/><circle cx="80" cy="68" r="5" fill="#ef9a9a" opacity=".7"/><circle cx="60" cy="68" r="5.5" fill="#e57373"/><path d="M60 76C50 66 32 72 36 82 42 90 56 86 60 78 64 86 78 90 84 82 88 72 70 66 60 76Z" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><path d="M52 92Q60 98 68 92" fill="none" stroke="#c62828" stroke-width="3" stroke-linecap="round"/></svg>`,
+    egg: `<svg viewBox="0 0 120 120"><defs><clipPath id="egg"><path d="M60 8C88 8 102 54 102 78 102 100 84 114 60 114 36 114 18 100 18 78 18 54 32 8 60 8Z"/></clipPath></defs><g clip-path="url(#egg)"><rect width="120" height="120" fill="#f5e6ff"/><path d="M0 50L15 42 30 50 45 42 60 50 75 42 90 50 105 42 120 50V64L105 56 90 64 75 56 60 64 45 56 30 64 15 56 0 64Z" fill="#7e57c2"/><rect y="76" width="120" height="14" fill="#ffb74d"/><circle cx="32" cy="102" r="5" fill="#f06292"/><circle cx="60" cy="102" r="5" fill="#f06292"/><circle cx="88" cy="102" r="5" fill="#f06292"/><circle cx="45" cy="24" r="4" fill="#ffb74d"/><circle cx="75" cy="24" r="4" fill="#f06292"/></g><path d="M60 8C88 8 102 54 102 78 102 100 84 114 60 114 36 114 18 100 18 78 18 54 32 8 60 8Z" fill="none" stroke="#7e57c2" stroke-width="3"/></svg>`,
+    cake: `<svg viewBox="0 0 120 120"><rect x="46" y="28" width="5" height="18" rx="2" fill="#ffd54f"/><rect x="58" y="28" width="5" height="18" rx="2" fill="#4fc3f7"/><rect x="70" y="28" width="5" height="18" rx="2" fill="#ffd54f"/><path d="M48.5 14C44 20 45 26 48.5 26S53 20 48.5 14Z" fill="#ff9800"/><path d="M60.5 14C56 20 57 26 60.5 26S65 20 60.5 14Z" fill="#ff9800"/><path d="M72.5 14C68 20 69 26 72.5 26S77 20 72.5 14Z" fill="#ff9800"/><rect x="32" y="46" width="56" height="26" rx="5" fill="#f8bbd0"/><rect x="22" y="72" width="76" height="28" rx="5" fill="#f48fb1"/><path d="M32 50q6 9 12 0t12 0 12 0 12 0 8 0V46H32Z" fill="#fff"/><path d="M22 76q6.5 9 13 0t13 0 13 0 13 0 13 0 10 0V72H22Z" fill="#fff"/><rect x="12" y="100" width="96" height="8" rx="4" fill="#b0bec5"/></svg>`,
+    hearts: `<svg viewBox="0 0 120 120"><path d="M50 104C10 72 6 42 26 32 40 26 50 34 50 42 52 34 62 26 76 32 96 42 92 72 50 104Z" fill="#c2185b"/><path d="M88 96C66 78 64 62 74 56 82 52 88 57 88 61 90 57 96 52 104 56 114 62 112 78 88 96Z" fill="#e57399"/><path d="M28 44C30 38 36 36 40 38" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/></svg>`,
+    pumpkin: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="72" rx="46" ry="36" fill="#e8791a"/><ellipse cx="38" cy="72" rx="24" ry="36" fill="#f28c2a" stroke="#c9600f" stroke-width="2"/><ellipse cx="82" cy="72" rx="24" ry="36" fill="#f28c2a" stroke="#c9600f" stroke-width="2"/><ellipse cx="60" cy="72" rx="15" ry="36" fill="#f7a648" stroke="#c9600f" stroke-width="2"/><rect x="55" y="26" width="10" height="18" rx="3" fill="#5d4037"/><path d="M65 36C80 24 96 30 96 40 84 42 74 44 65 40Z" fill="#558b2f"/></svg>`,
+    drumstick: `<svg viewBox="0 0 120 120"><path d="M58 76L96 106" stroke="#b9a98d" stroke-width="14" stroke-linecap="round"/><circle cx="98" cy="101" r="8.5" fill="#b9a98d"/><circle cx="106" cy="110" r="8.5" fill="#b9a98d"/><path d="M58 76L96 106" stroke="#f5efe6" stroke-width="10" stroke-linecap="round"/><circle cx="98" cy="101" r="6.5" fill="#f5efe6"/><circle cx="106" cy="110" r="6.5" fill="#f5efe6"/><path d="M22 60C22 30 50 12 74 22 98 32 94 66 68 78 50 86 22 86 22 60Z" fill="#c1762b"/><path d="M34 52C36 38 50 30 62 32" fill="none" stroke="#e6a75c" stroke-width="6" stroke-linecap="round"/></svg>`,
+    glasses: `<svg viewBox="0 0 120 120"><g transform="translate(-4 6) rotate(14 40 98)"><path d="M26 18H54C54 48 48 60 40 60 32 60 26 48 26 18Z" fill="#eef0fb" stroke="#5c6bc0" stroke-width="2.5"/><path d="M28 34H52C51 50 47 58 40 58 33 58 29 50 28 34Z" fill="#a02c4d"/><path d="M40 60V96" stroke="#5c6bc0" stroke-width="3"/><path d="M28 98H52" stroke="#5c6bc0" stroke-width="4" stroke-linecap="round"/></g><g transform="translate(44 6) rotate(-14 40 98)"><path d="M26 18H54C54 48 48 60 40 60 32 60 26 48 26 18Z" fill="#eef0fb" stroke="#5c6bc0" stroke-width="2.5"/><path d="M28 34H52C51 50 47 58 40 58 33 58 29 50 28 34Z" fill="#d9a441"/><path d="M40 60V96" stroke="#5c6bc0" stroke-width="3"/><path d="M28 98H52" stroke="#5c6bc0" stroke-width="4" stroke-linecap="round"/></g></svg>`,
+    cloche: `<svg viewBox="0 0 120 120"><path d="M16 88C16 46 40 32 60 32S104 46 104 88Z" fill="#cfd8dc" stroke="#78909c" stroke-width="3"/><path d="M28 78C30 58 42 46 56 44" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/><circle cx="60" cy="26" r="7" fill="#90a4ae"/><rect x="8" y="88" width="104" height="8" rx="4" fill="#90a4ae"/></svg>`,
+  };
+  const OCCASIONS = [
+    { id: "xmas",    label: "Christmas",          title: "Christmas dinner",    art: "santa",     paper: "#f4f6f1", main: "#1f4d3a", soft: "#dfe9e2", accent: "#a8223a", line: "#c5d0c9" },
+    { id: "easter",  label: "Easter",             title: "Easter Sunday lunch", art: "egg",       paper: "#f9f7fc", main: "#5b4a9e", soft: "#ebe5f6", accent: "#a34a0a", line: "#d6cfe6" },
+    { id: "bday",    label: "Birthday",           title: "Birthday meal",       art: "cake",      paper: "#fff8fb", main: "#b0164f", soft: "#fbe3ed", accent: "#1259a8", line: "#ecd0dc" },
+    { id: "anniv",   label: "Anniversary",        title: "Anniversary dinner",  art: "hearts",    paper: "#fbf6f6", main: "#8e1b3a", soft: "#f5e0e5", accent: "#8a6508", line: "#e6cfd4" },
+    { id: "valent",  label: "Valentine's Day",    title: "Valentine's dinner",  art: "hearts",    paper: "#fbf6f6", main: "#a11543", soft: "#f8dde7", accent: "#6e2b8c", line: "#ecd0da" },
+    { id: "thanks",  label: "Thanksgiving",       title: "Thanksgiving dinner", art: "pumpkin",   paper: "#fbf7f1", main: "#9c4a12", soft: "#f5e5d5", accent: "#6b2a10", line: "#e5d3c2" },
+    { id: "sunday",  label: "Sunday roast",       title: "Sunday roast",        art: "drumstick", paper: "#f8f5f1", main: "#5a3e2b", soft: "#ece2d8", accent: "#a04d0f", line: "#d9cec3" },
+    { id: "party",   label: "Dinner party",       title: "Dinner party",        art: "glasses",   paper: "#f5f6fa", main: "#1f2a5c", soft: "#dde2f3", accent: "#8c5a10", line: "#cfd5e4" },
+    { id: "other",   label: "Something else",     title: "Special meal",        art: "cloche",    paper: "#f3f7f7", main: "#14625e", soft: "#d9ecea", accent: "#a63a1e", line: "#c6d8d6" },
+  ];
+  function updateQuantities() {
+    document.querySelectorAll("#sides [data-qty]").forEach(el => {
+      const side = SIDES.flatMap(g => g.items).find(s => s.id === el.dataset.qty);
+      if (side) el.textContent = " (" + qtyFor(side.per) + ")";
+    });
+  }
+
+  function currentOccasion() { return OCCASIONS.find(o => o.id === $("occasion").value) || OCCASIONS[0]; }
+  function mealTitle() { return ($("occname").value || "").trim() || currentOccasion().title; }
+  function applyTitle() {
+    $("title").textContent = mealTitle();
+    document.title = mealTitle() + " planner";
+  }
+  function updateSuggest() {
+    const p = PRESETS.find(x => x.id === $("preset").value);
+    if (!p) { $("suggesttext").textContent = ""; return; }
+    let kg = p.per * people();
+    const val = $("unit").value === "lb" ? (kg / 0.45359237) : kg;
+    $("suggesttext").textContent = "Guide for " + people() + " people: " + val.toFixed(1) + " " + $("unit").value;
+    $("btn-suggest").dataset.kg = kg;
+  }
+
+  function applyOccasion() {
+    const o = currentOccasion(), r = document.documentElement.style;
+    r.setProperty("--paper", o.paper); r.setProperty("--pine", o.main); r.setProperty("--pine-soft", o.soft);
+    r.setProperty("--cran", o.accent); r.setProperty("--line", o.line);
+    $("art").innerHTML = ART[o.art];
+    applyTitle();
+  }
 
   // Setup
+  const occSel = $("occasion");
+  OCCASIONS.forEach(o => { const el = document.createElement("option"); el.value = o.id; el.textContent = o.label; occSel.appendChild(el); });
+  occSel.addEventListener("change", applyOccasion);
+  $("occname").addEventListener("input", applyTitle);
   const sel = $("preset");
   PRESETS.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.label; sel.appendChild(o); });
   sel.addEventListener("change", applyPreset);
@@ -477,6 +664,7 @@
   const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(18, 0, 0, 0);
   $("serve").value = t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()) + "T18:00";
 
+  applyOccasion();
   renderSides();
   applyPreset();
   renderEditor();
