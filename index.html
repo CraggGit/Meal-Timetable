@@ -517,9 +517,13 @@
     clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2200);
   }
 
-  // Calendar export (.ics). Times are "floating" so they use the phone's own time zone.
+  // Calendar export (.ics). Times are written as absolute UTC (with a "Z"), which every calendar
+  // app converts correctly to the viewer's own time zone. (A plain "floating" time with no Z or
+  // TZID is read as UTC by some apps, such as Google Calendar, which is what caused times to be
+  // an hour out during British Summer Time.)
   function icsDate(d) {
-    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00";
+    const iso = d.toISOString(); // e.g. 2026-12-25T14:00:00.000Z
+    return iso.slice(0, 4) + iso.slice(5, 7) + iso.slice(8, 10) + "T" + iso.slice(11, 13) + iso.slice(14, 16) + iso.slice(17, 19) + "Z";
   }
   const esc = s => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
 
