@@ -16,6 +16,7 @@
     --white: #ffffff;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body {
     margin: 0; background: var(--paper); color: var(--ink);
     font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -71,6 +72,7 @@
   button.primary { background: var(--pine); color: var(--white); flex: 1 1 100%; }
   button.small { padding: 6px 10px; font-size: 14px; }
   button.danger { border-color: var(--line); color: var(--cran); }
+  button:disabled { opacity: .45; cursor: default; }
   details { border: 1.5px solid var(--line); border-radius: 8px; background: var(--white); padding: 0 14px; }
   summary { padding: 14px 0; font-weight: 600; cursor: pointer; }
   details[open] summary { border-bottom: 1px solid var(--line); margin-bottom: 14px; }
@@ -114,17 +116,91 @@
   .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: #fff;
     padding: 10px 16px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; }
   .toast.show { opacity: 1; }
+
+  /* Time Outs */
+  .gaprow { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--line);
+    border-radius: 8px; background: var(--white); margin-bottom: 8px; }
+  .gaprow input { width: 18px; height: 18px; margin: 3px 0 0; flex: none; accent-color: var(--pine); }
+  .gaprow .gtxt { flex: 1; min-width: 0; font-size: 15px; }
+  .gaprow small { display: block; color: var(--muted); }
+  .gaprow .tag { flex: none; font-size: 12px; font-weight: 600; color: var(--muted); text-align: right; max-width: 110px; }
+  .gaprow.use { border-color: var(--pine); background: var(--pine-soft); }
+  .gaprow.use .tag { color: var(--pine); }
+  li.timeout .time { font: 600 15px/1.4 Georgia, serif; color: var(--muted); padding-top: 6px; }
+  li.timeout .task::before { background: var(--paper); border: 3px solid var(--pine); }
+  .tobox { border: 1.5px dashed var(--pine); border-radius: 8px; background: var(--pine-soft); padding: 8px 12px; }
+  .tobox b { display: inline; color: var(--pine); }
+  .tobox small { margin-top: 2px; }
+  li.timeout.active .tobox { background: var(--pine); border-style: solid; }
+  li.timeout.active .tobox b, li.timeout.active .tobox small, li.timeout.active .tobox .tocount { color: var(--white); }
+
+  /* Cooking mode, recipe links, tick-offs */
+  .cookbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--pine-soft);
+    border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; font-size: 14px; }
+  .cookbar button { flex: none; padding: 8px 12px; font-size: 14px; }
+  .cookbar.on { background: var(--pine); color: var(--white); }
+  .cookbar.on button { border-color: var(--white); }
+  .reclink { display: block; margin-top: 6px; padding: 6px 10px; font-size: 13px; text-align: left; }
+  .reclink.locked { border-style: dashed; border-color: var(--line); color: var(--muted); }
+  .pill { display: inline-block; font: 600 12px/1.4 system-ui, sans-serif; padding: 1px 8px; border-radius: 99px;
+    background: var(--pine); color: var(--white); margin-left: 8px; vertical-align: 1px; }
+  .pill.due { background: var(--cran); }
+  .donechk { margin-top: 6px; font-size: 14px; }
+  li.done .task b { text-decoration: line-through; color: var(--muted); }
+  li.done .task small, li.done .reclink { opacity: .55; }
+
+  /* Shopping list */
+  #shopsum:focus { outline: 3px solid var(--pine); outline-offset: 2px; }
+  .shopcat { font: 700 16px/1.3 Georgia, serif; margin: 20px 0 6px; color: var(--pine); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .shopcat small { font: 500 13px system-ui, sans-serif; color: var(--muted); }
+  .shopgroup { border-top: 1px solid var(--line); }
+  .shoprow { display: grid; grid-template-columns: minmax(84px, 30%) 1fr auto; gap: 10px; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .shoprow .sq { font-weight: 700; }
+  .shoprow .sq.dim { font-weight: 500; color: var(--muted); }
+  .shoprow .sn b { font-weight: 600; }
+  .shoprow small { display: block; color: var(--muted); font-size: 13px; line-height: 1.35; }
+  .shoprow.gone .sq, .shoprow.gone .sn b { color: var(--muted); }
+  #removedbox { margin-top: 18px; }
+  #removedbox .shoprow:last-child { border-bottom: 0; }
+  .shopadd { margin-top: 20px; }
+
+  /* Recipe screen */
+  #recipeview h1 { margin-top: 12px; }
+  #recipeview h2 { margin-top: 22px; }
+  .rv-meta { color: var(--muted); margin: 0 0 14px; font-size: 15px; }
+  .rv-box { background: var(--pine-soft); border-radius: 8px; padding: 10px 14px; font-size: 14px; margin-bottom: 8px; }
+  .rv-box ul { margin: 4px 0 0; padding-left: 18px; }
+  ul.ing { list-style: none; margin: 0 0 8px; padding: 0; border-top: 1px solid var(--line); }
+  ul.ing li { display: grid; grid-template-columns: minmax(96px, 36%) 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  ul.ing .q { font-weight: 700; }
+  ol.method { margin: 0; padding-left: 22px; }
+  ol.method li { margin-bottom: 10px; }
+  #recipeview ul.plain { margin: 0; padding-left: 20px; }
+
+  dialog { border: 1.5px solid var(--line); border-radius: 12px; padding: 18px; max-width: 420px; width: calc(100% - 32px);
+    color: var(--ink); background: var(--white); }
+  dialog::backdrop { background: rgba(0, 0, 0, .4); }
+  dialog h2 { font-size: 18px; margin: 0 0 8px; }
+  dialog p { margin: 0 0 12px; }
+
   @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
-  @media print { .actions, details, .howto, .noprint { display: none; } body { background: #fff; } }
+  @media print {
+    .actions, details, .howto, .noprint, .cookbar, .reclink, .donechk, .pill { display: none; }
+    body { background: #fff; }
+    /* Normal print is the timeline; "Print shopping list" prints only the list. */
+    body:not(.print-shop) #shopsec { display: none; }
+    body.print-shop .hero, body.print-shop #appmain > section:not(#shopsec) { display: none; }
+  }
 </style>
 </head>
 <body>
-<main>
+<main id="appmain">
   <header class="hero">
     <div class="art" id="art" aria-hidden="true"></div>
     <div>
       <h1 id="title">Special meal planner</h1>
-      <p class="lede">Pick your main, enter its weight and when you want to eat. You get a timeline, and can add every step to your phone calendar with an alert.</p>
+      <p class="lede">Pick your main, enter its weight and when you want to eat. You get a timeline with recipes and Time Outs, a shopping list, and can add every step to your phone calendar with an alert.</p>
     </div>
   </header>
 
@@ -187,12 +263,41 @@
 
   <section class="noprint" aria-labelledby="h-veg">
     <h2 id="h-veg">Vegetables and sides</h2>
-    <p class="hint">Tick what you're making. Each one adds its steps to the timeline.</p>
+    <p class="hint">Tick what you're making. Each one adds its steps to the timeline and its ingredients to the shopping list.</p>
     <div id="sides"></div>
+  </section>
+
+  <section class="noprint" aria-labelledby="h-to">
+    <h2 id="h-to">Time Outs</h2>
+    <p class="hint">A Time Out tells you how long you have until your next task, so you can put your feet up. Choose the shortest gap that counts as a break, and the plan adds up to two. The gaps below are counted from when you finish the task before, so set how long that usually takes.</p>
+    <div class="row">
+      <div>
+        <label for="tmmin">Shortest gap for a Time Out</label>
+        <div class="unit-field"><input id="tmmin" type="number" inputmode="numeric" min="5" step="5" value="20"><span class="unit">min</span></div>
+      </div>
+      <div>
+        <label for="tmmode">Who picks them?</label>
+        <select id="tmmode">
+          <option value="auto">The plan (two longest gaps)</option>
+          <option value="manual">I'll choose</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="tmallow">Time to finish each task first</label>
+        <div class="unit-field"><input id="tmallow" type="number" inputmode="numeric" min="0" max="60" step="5" value="10"><span class="unit">min</span></div>
+      </div>
+    </div>
+    <div id="gaps" aria-live="polite"></div>
   </section>
 
   <section aria-labelledby="h-plan">
     <h2 id="h-plan">Your timeline</h2>
+    <div class="cookbar noprint" id="cookbar">
+      <div id="cooktext"></div>
+      <button type="button" id="btn-cook"></button>
+    </div>
     <ol class="timeline" id="timeline"></ol>
     <div class="actions">
       <button class="primary" id="btn-ics">Add to calendar with alerts</button>
@@ -212,6 +317,38 @@
         <label class="check"><input type="checkbox" id="notetitle"> Show notes in the alert title too</label>
         <label class="check"><input type="checkbox" id="ovenrem" checked> Include oven pre-heat reminders</label>
       </div>
+    </div>
+  </section>
+
+  <section id="shopsec" aria-labelledby="h-shop">
+    <h2 id="h-shop">Shopping list</h2>
+    <p class="hint noprint">Everything for the main dish and the sides you ticked, added up and scaled to your number of people. Quantities are a guide. Press Remove on anything you already have. Store cupboard items you remove are remembered on this device.</p>
+    <div class="summary" id="shopsum" tabindex="-1" aria-live="polite"></div>
+    <div class="actions noprint">
+      <button type="button" class="small" id="btn-nocup">Remove all store cupboard items</button>
+      <button type="button" class="small" id="btn-restore">Put everything back</button>
+    </div>
+    <div id="shoplist"></div>
+    <details id="removedbox" class="noprint" hidden>
+      <summary id="removedsum">Removed from your list</summary>
+      <div id="gonelist"></div>
+    </details>
+    <div class="shopadd noprint">
+      <div class="row">
+        <div>
+          <label for="xname">Add something else</label>
+          <input id="xname" type="text" placeholder="e.g. Cranberry sauce">
+        </div>
+        <div class="narrow">
+          <label for="xqty">Amount</label>
+          <input id="xqty" type="text" placeholder="e.g. 2 jars">
+        </div>
+      </div>
+      <button type="button" class="small" id="btn-xadd">Add to list</button>
+    </div>
+    <div class="actions">
+      <button class="primary" id="btn-shopcopy">Copy shopping list</button>
+      <button id="btn-shopprint">Print shopping list</button>
     </div>
   </section>
 
@@ -240,22 +377,43 @@
     </details>
   </section>
 </main>
+
+<main id="recipeview" hidden aria-labelledby="rv-title">
+  <div class="actions noprint" style="margin:0 0 8px">
+    <button type="button" class="small" id="rv-back">&larr; Back to timeline</button>
+  </div>
+  <div id="rv-body"></div>
+  <div class="actions noprint" style="margin-top:24px">
+    <button type="button" class="primary" id="rv-back2">Back to timeline</button>
+  </div>
+</main>
+
+<dialog id="lockdlg" aria-labelledby="lockttl">
+  <h2 id="lockttl">Not due yet</h2>
+  <p id="locktxt"></p>
+  <div class="actions" style="margin-top:0">
+    <button type="button" id="lock-yes">View anyway</button>
+    <button type="button" id="lock-no">Not yet</button>
+  </div>
+</dialog>
 <div class="toast" id="toast" role="status"></div>
 
 <script>
   // Sides and extras. Each step happens a set number of minutes before eating. {dish} becomes the main dish name.
   // per: guide quantity per person - {amt, unit, label}. unit "" = whole items, "g" grams, "ml" millilitres.
+  // rid: id of the built-in recipe (see RECIPES) that the step links to.
+  // Potatoes, parsnips and red cabbage quantities come from their recipes (serves 8).
   const SIDES = [
     { group: "Vegetables", items: [
-      { id: "roasties", name: "Roast potatoes", on: true, per: { amt: 200, unit: "g", label: "potatoes" }, steps: [
+      { id: "roasties", rid: "roasties", name: "Roast potatoes", on: true, per: { amt: 175, unit: "g", label: "potatoes" }, steps: [
         { name: "Peel and parboil the potatoes", mins: 100 }, { name: "Roast potatoes into the hot oven", mins: 60 } ] },
-      { id: "parsnips", name: "Roast parsnips", on: true, per: { amt: 100, unit: "g", label: "parsnips" }, steps: [ { name: "Parsnips into the oven", mins: 45 } ] },
+      { id: "parsnips", rid: "parsnips", name: "Roast parsnips", on: true, per: { amt: 112.5, unit: "g", label: "parsnips" }, steps: [ { name: "Parsnips into the oven", mins: 45 } ] },
       { id: "roastcarrots", name: "Roast carrots", per: { amt: 100, unit: "g", label: "carrots" }, steps: [ { name: "Carrots into the oven", mins: 45 } ] },
       { id: "sprouts", name: "Brussels sprouts", on: true, per: { amt: 100, unit: "g", label: "sprouts" }, steps: [ { name: "Sprouts on to cook", mins: 12 } ] },
       { id: "carrots", name: "Boiled carrots", per: { amt: 100, unit: "g", label: "carrots" }, steps: [ { name: "Carrots on to boil", mins: 15 } ] },
       { id: "broccoli", name: "Broccoli", per: { amt: 80, unit: "g", label: "broccoli" }, steps: [ { name: "Broccoli on to steam", mins: 8 } ] },
       { id: "peas", name: "Peas or green beans", per: { amt: 60, unit: "g", label: "peas or beans" }, steps: [ { name: "Peas or beans on to cook", mins: 6 } ] },
-      { id: "cabbage", name: "Red cabbage", per: { amt: 100, unit: "g", label: "red cabbage" }, steps: [ { name: "Red cabbage on to braise", mins: 120 } ] },
+      { id: "cabbage", rid: "cabbage", name: "Red cabbage", per: { amt: 100, unit: "g", label: "red cabbage" }, steps: [ { name: "Red cabbage on to braise", mins: 150 } ] },
       { id: "cauli", name: "Cauliflower cheese", per: { amt: 150, unit: "g", label: "cauliflower" }, steps: [
         { name: "Make the cauliflower cheese", mins: 75 }, { name: "Cauliflower cheese into the oven", mins: 30 } ] },
       { id: "mash", name: "Mashed potato", per: { amt: 200, unit: "g", label: "potatoes" }, steps: [
@@ -276,11 +434,11 @@
   ];
   // Starter notes. Edit them in the page.
   const NOTES = {
-    "Peel and parboil the potatoes": "Boil 8 to 10 minutes, drain, shake in the pan to roughen the edges.\nPut the fat in the tin to heat.",
-    "Roast potatoes into the hot oven": "Fat should sizzle when they go in. Turn once halfway.",
-    "Parsnips into the oven": "Toss in oil and season. Turn once.",
+    "Peel and parboil the potatoes": "Cut into even chunks. Boil for about 5 minutes, drain, then shake in the colander to rough up the edges.",
+    "Roast potatoes into the hot oven": "Heat the goose fat in the tin for about 5 minutes first. It should sizzle when the potatoes go in. Turn now and then.",
+    "Parsnips into the oven": "Blanch for about 3 minutes and drain first. Roast for 20 to 25 minutes, turn, then roast 15 to 20 more.",
     "Sprouts on to cook": "Boil 5 to 7 minutes. Drain well.",
-    "Red cabbage on to braise": "Cook gently with apple, vinegar and spices. Stir now and then.",
+    "Red cabbage on to braise": "Cover tightly and braise for 2 to 2½ hours, stirring once or twice.",
     "Put the tin and fat in to heat": "Fat must be smoking hot before the batter goes in.",
     "Make the gravy": "Use the tray juices. Skim off the fat.",
   };
@@ -292,6 +450,166 @@
   };
   SIDES.forEach(g => g.items.forEach(side => side.steps.forEach(st => { st.oven = OVENS[st.name] || ""; })));
   const customs = []; // your own extra steps
+
+  // Built-in recipes. Quantities are for 8 people and scale with "Number of people".
+  // Ingredient: base = amount for 8 (a number, or [low, high]); unit is a key of UNITS; pre = words before the amount;
+  // or text = a fixed phrase such as "to taste". In method text, **bold** marks the lead word.
+  // item = the shopping list item (see ITEMS); items = several shopping list items for one line such as "Salt and pepper".
+  // To add a recipe: add an entry here, then give its side a matching rid in SIDES.
+  const UNITS = {
+    g: {},
+    tbsp: { step: 0.25, label: "tbsp" },
+    tsp: { step: 0.125, label: "tsp" },
+    nutmeg: { step: 0.125, label: "of a whole nutmeg" },
+    clove: { step: 0.5, one: "clove", many: "cloves" },
+  };
+  const RECIPES = {
+    roasties: {
+      title: "Roast Potatoes",
+      oven: "220°C / Fan 200°C / Gas 7",
+      ingredients: [
+        { name: "Old potatoes (Désirée, King Edward or Maris Piper), peeled", base: 1400, unit: "g", item: "potatoes" },
+        { name: "Goose fat", base: [3, 4], unit: "tbsp", item: "goosefat" },
+        { name: "Salt", text: "to taste", item: "salt" },
+        { name: "Freshly ground black pepper", text: "to taste", item: "pepper" },
+      ],
+      method: [
+        "**Preheat** the oven to 220°C / Fan 200°C / Gas 7.",
+        "**Cut** the potatoes into evenly sized chunks and put them in a large pan.",
+        "**Parboil:** cover with cold water, add a pinch of salt, bring to the boil and cook for about 5 minutes.",
+        "**Drain and fluff:** drain well in a colander, then shake it to rough up the edges.",
+        "**Heat the fat:** put the goose fat in a large roasting tin in the oven for about 5 minutes until piping hot.",
+        "**Coat:** add the potatoes, spoon the fat over to coat them fully, and shake the tin so they don't stick. Season with pepper.",
+        "**Roast** for about 1 hour (depending on size), turning occasionally, until golden and crisp.",
+        "**Serve:** sprinkle with salt just before serving.",
+      ],
+      makeAhead: ["Half-roast the day before until pale golden, drain off excess fat, cool and keep somewhere cool overnight. On the day, re-roast in a hot oven for about 20 minutes until crisp."],
+      tip: "Goose fat gives great flavour, but don't overdo it or the potatoes turn greasy.",
+    },
+    parsnips: {
+      title: "Roast Parsnips",
+      oven: "220°C / Fan 200°C / Gas 7",
+      ingredients: [
+        { name: "Parsnips, peeled", base: 900, unit: "g", item: "parsnips" },
+        { name: "Goose fat", base: 2, unit: "tbsp", pre: "about ", item: "goosefat" },
+        { name: "Salt", text: "to taste", item: "salt" },
+        { name: "Freshly ground black pepper", text: "to taste", item: "pepper" },
+      ],
+      method: [
+        "**Preheat** the oven to 220°C / Fan 200°C / Gas 7.",
+        "**Cut** the parsnips into chunky lengths.",
+        "**Blanch:** cook in boiling salted water for about 3 minutes, then drain well.",
+        "**Heat the fat:** put the goose fat in a large roasting tin in the oven until sizzling hot.",
+        "**First roast:** add the parsnips, spoon the fat over to coat evenly, and roast for 20–25 minutes (depending on size) until golden.",
+        "**Turn and finish:** turn the parsnips in the fat and roast for another 15–20 minutes until deep gold.",
+        "**Serve:** season with salt and pepper.",
+      ],
+      makeAhead: [
+        "Once peeled, parsnips must be blanched or they'll turn brown.",
+        "Blanch the day before, cool, cover and keep somewhere cool overnight.",
+        "Or half-roast the day before until pale golden (20–25 min), lift out of the fat and cool. On the day, re-roast at the same temperature for 15–20 minutes.",
+        "Short on time? Skip blanching and roast from raw; they'll just take a little longer.",
+      ],
+      tip: "Same oven temperature as the roast potatoes, so both can go in together.",
+    },
+    cabbage: {
+      title: "Braised Red Cabbage with Apples",
+      oven: "150°C / Gas 2. For a fan oven, about 130°C.",
+      equipment: "Large casserole with a tight-fitting lid",
+      ingredients: [
+        { name: "Red cabbage", base: 800, unit: "g", item: "redcabbage" },
+        { name: "Onions, chopped small", base: 350, unit: "g", item: "onions" },
+        { name: "Cooking apples, peeled, cored and chopped small", base: 350, unit: "g", item: "apples" },
+        { name: "Garlic, chopped very finely", base: 1, unit: "clove", item: "garlic" },
+        { name: "Nutmeg, freshly grated", base: 0.25, unit: "nutmeg", pre: "a little under ", item: "nutmeg" },
+        { name: "Ground cinnamon", base: 0.25, unit: "tsp", pre: "a scant ", item: "cinnamon" },
+        { name: "Ground cloves", base: 0.25, unit: "tsp", pre: "a scant ", item: "groundcloves" },
+        { name: "Brown sugar", base: 2.5, unit: "tbsp", item: "brownsugar" },
+        { name: "Wine vinegar", base: 2.5, unit: "tbsp", item: "winevinegar" },
+        { name: "Butter", base: 12, unit: "g", item: "butter" },
+        { name: "Salt and pepper", text: "to taste", items: ["salt", "pepper"] },
+      ],
+      method: [
+        "**Preheat** the oven to 150°C / Gas 2.",
+        "**Prepare the cabbage:** remove the tough outer leaves, cut into quarters and cut out the hard stalk.",
+        "**Shred** the cabbage finely with a sharp knife or a food processor (hand-shredding gives a less uniform, nicer texture).",
+        "**Layer:** in the casserole, put a layer of cabbage and season it. Add a layer of onions and apples, then sprinkle over some garlic, spices and sugar. Repeat until everything is used.",
+        "**Finish:** pour the wine vinegar over and dot the butter on top.",
+        "**Braise:** cover tightly and cook slowly in the oven for 2–2½ hours, stirring once or twice.",
+      ],
+      makeAhead: [
+        "Can be made 1–2 days ahead and reheated gently, so there's nothing to do on the day.",
+        "Once cooked, it keeps warm happily without spoiling.",
+        "It reheats well and freezes well.",
+      ],
+      serveWith: "Venison, goose or pork. Leftovers are great with sausages and mash.",
+    },
+  };
+
+  // ---- Shopping list data ---------------------------------------------------------------------------------
+  // ITEMS: every thing you might buy. cat = the shop section. note = a short buying hint.
+  // eachG = grams in one whole item, so "350 g onions" in a recipe adds up with "2 onions" elsewhere.
+  const CUPBOARD = "Store cupboard";
+  const SHOP_CATS = ["The main dish", "Fruit & veg", "Meat & fish", "Dairy & eggs", "Bakery", CUPBOARD, "Your extras"];
+  const ITEMS = {
+    potatoes:     { name: "Potatoes (Maris Piper, King Edward or Désirée)", cat: "Fruit & veg" },
+    parsnips:     { name: "Parsnips", cat: "Fruit & veg" },
+    carrots:      { name: "Carrots", cat: "Fruit & veg" },
+    sprouts:      { name: "Brussels sprouts", cat: "Fruit & veg" },
+    broccoli:     { name: "Broccoli", cat: "Fruit & veg" },
+    peas:         { name: "Peas or green beans", cat: "Fruit & veg", note: "fresh or frozen" },
+    cauliflower:  { name: "Cauliflower", cat: "Fruit & veg" },
+    redcabbage:   { name: "Red cabbage", cat: "Fruit & veg" },
+    onions:       { name: "Onions", cat: "Fruit & veg", eachG: 175 },
+    apples:       { name: "Cooking apples", cat: "Fruit & veg" },
+    garlic:       { name: "Garlic", cat: "Fruit & veg", note: "one bulb is plenty" },
+    sausagemeat:  { name: "Sausagemeat", cat: "Meat & fish" },
+    pigs:         { name: "Pigs in blankets", cat: "Meat & fish" },
+    butter:       { name: "Butter", cat: "Dairy & eggs" },
+    milk:         { name: "Milk", cat: "Dairy & eggs" },
+    cheddar:      { name: "Mature Cheddar", cat: "Dairy & eggs" },
+    eggs:         { name: "Eggs", cat: "Dairy & eggs", note: "large" },
+    breadcrumbs:  { name: "Fresh white breadcrumbs (or white bread to blitz)", cat: "Bakery" },
+    goosefat:     { name: "Goose fat", cat: CUPBOARD },
+    oliveoil:     { name: "Olive oil", cat: CUPBOARD },
+    vegoil:       { name: "Vegetable oil or beef dripping", cat: CUPBOARD },
+    flour:        { name: "Plain flour", cat: CUPBOARD },
+    stock:        { name: "Stock (turkey, chicken or beef)", cat: CUPBOARD, note: "or stock cubes" },
+    mustard:      { name: "English mustard", cat: CUPBOARD },
+    sage:         { name: "Dried sage", cat: CUPBOARD },
+    cinnamon:     { name: "Ground cinnamon", cat: CUPBOARD },
+    groundcloves: { name: "Ground cloves", cat: CUPBOARD },
+    wholecloves:  { name: "Whole cloves", cat: CUPBOARD, note: "for the bread sauce onion" },
+    bayleaf:      { name: "Bay leaves", cat: CUPBOARD },
+    nutmeg:       { name: "Whole nutmeg", cat: CUPBOARD },
+    brownsugar:   { name: "Brown sugar", cat: CUPBOARD },
+    winevinegar:  { name: "Wine vinegar", cat: CUPBOARD },
+    salt:         { name: "Salt", cat: CUPBOARD },
+    pepper:       { name: "Black pepper", cat: CUPBOARD },
+  };
+  // Ingredients for sides that have no full recipe above. Amounts are for 8 people (guide quantities).
+  // Sides with a recipe (rid) use that recipe's ingredients instead.
+  const SHOPDATA = {
+    roastcarrots: [ { item: "carrots", base: 800, unit: "g" }, { item: "oliveoil", base: 2, unit: "tbsp" }, { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
+    sprouts:      [ { item: "sprouts", base: 800, unit: "g" }, { item: "butter", base: 25, unit: "g" }, { item: "salt", text: "to taste" } ],
+    carrots:      [ { item: "carrots", base: 800, unit: "g" }, { item: "butter", base: 15, unit: "g" }, { item: "salt", text: "to taste" } ],
+    broccoli:     [ { item: "broccoli", base: 640, unit: "g" }, { item: "salt", text: "to taste" } ],
+    peas:         [ { item: "peas", base: 480, unit: "g" } ],
+    cauli:        [ { item: "cauliflower", base: 1200, unit: "g" }, { item: "butter", base: 50, unit: "g" }, { item: "flour", base: 50, unit: "g" },
+                    { item: "milk", base: 600, unit: "ml" }, { item: "cheddar", base: 200, unit: "g" }, { item: "mustard", base: 1, unit: "tsp" },
+                    { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
+    mash:         [ { item: "potatoes", base: 1600, unit: "g" }, { item: "butter", base: 100, unit: "g" }, { item: "milk", base: 100, unit: "ml" },
+                    { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
+    stuffing:     [ { item: "sausagemeat", base: 500, unit: "g" }, { item: "onions", base: 2, unit: "each" }, { item: "breadcrumbs", base: 100, unit: "g" },
+                    { item: "sage", base: 2, unit: "tsp" }, { item: "butter", base: 25, unit: "g" }, { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
+    pigs:         [ { item: "pigs", base: 16, unit: "each" } ],
+    yorkies:      [ { item: "flour", base: 200, unit: "g" }, { item: "eggs", base: 5, unit: "each" }, { item: "milk", base: 300, unit: "ml" },
+                    { item: "vegoil", base: 4, unit: "tbsp" }, { item: "salt", text: "to taste" } ],
+    breadsauce:   [ { item: "milk", base: 600, unit: "ml" }, { item: "onions", base: 1, unit: "each" }, { item: "wholecloves", base: 6, unit: "each" },
+                    { item: "bayleaf", base: 2, unit: "each" }, { item: "breadcrumbs", base: 100, unit: "g" }, { item: "butter", base: 25, unit: "g" },
+                    { item: "nutmeg", base: 0.125, unit: "nutmeg" }, { item: "salt", text: "to taste" } ],
+    gravy:        [ { item: "flour", base: 30, unit: "g" }, { item: "stock", base: 600, unit: "ml" }, { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
+  };
 
   // Guide timings (UK-style). perkg = minutes per kg, extra = fixed minutes, rest = resting minutes.
   const PRESETS = [
@@ -309,12 +627,60 @@
     { id: "custom",  label: "Something else",       dish: "Main",         w: 2,   perkg: 30, extra: 30, rest: 20, oven: 180, per: 0.3, temp: "Check it is cooked through before serving." },
   ];
 
+  // Occasions: title, colour theme and a drawn picture for each.
+  const ART = {
+    santa: `<svg viewBox="0 0 120 120"><path d="M20 58C20 100 44 114 60 114S100 100 100 58Z" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><ellipse cx="60" cy="58" rx="30" ry="24" fill="#f6c9a8"/><path d="M24 48C22 16 58 4 84 16 98 24 94 42 96 48Z" fill="#c62828"/><rect x="20" y="40" width="80" height="15" rx="7.5" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><circle cx="90" cy="14" r="9" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><circle cx="48" cy="60" r="3.2" fill="#222"/><circle cx="72" cy="60" r="3.2" fill="#222"/><circle cx="40" cy="68" r="5" fill="#ef9a9a" opacity=".7"/><circle cx="80" cy="68" r="5" fill="#ef9a9a" opacity=".7"/><circle cx="60" cy="68" r="5.5" fill="#e57373"/><path d="M60 76C50 66 32 72 36 82 42 90 56 86 60 78 64 86 78 90 84 82 88 72 70 66 60 76Z" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><path d="M52 92Q60 98 68 92" fill="none" stroke="#c62828" stroke-width="3" stroke-linecap="round"/></svg>`,
+    egg: `<svg viewBox="0 0 120 120"><defs><clipPath id="egg"><path d="M60 8C88 8 102 54 102 78 102 100 84 114 60 114 36 114 18 100 18 78 18 54 32 8 60 8Z"/></clipPath></defs><g clip-path="url(#egg)"><rect width="120" height="120" fill="#f5e6ff"/><path d="M0 50L15 42 30 50 45 42 60 50 75 42 90 50 105 42 120 50V64L105 56 90 64 75 56 60 64 45 56 30 64 15 56 0 64Z" fill="#7e57c2"/><rect y="76" width="120" height="14" fill="#ffb74d"/><circle cx="32" cy="102" r="5" fill="#f06292"/><circle cx="60" cy="102" r="5" fill="#f06292"/><circle cx="88" cy="102" r="5" fill="#f06292"/><circle cx="45" cy="24" r="4" fill="#ffb74d"/><circle cx="75" cy="24" r="4" fill="#f06292"/></g><path d="M60 8C88 8 102 54 102 78 102 100 84 114 60 114 36 114 18 100 18 78 18 54 32 8 60 8Z" fill="none" stroke="#7e57c2" stroke-width="3"/></svg>`,
+    cake: `<svg viewBox="0 0 120 120"><rect x="46" y="28" width="5" height="18" rx="2" fill="#ffd54f"/><rect x="58" y="28" width="5" height="18" rx="2" fill="#4fc3f7"/><rect x="70" y="28" width="5" height="18" rx="2" fill="#ffd54f"/><path d="M48.5 14C44 20 45 26 48.5 26S53 20 48.5 14Z" fill="#ff9800"/><path d="M60.5 14C56 20 57 26 60.5 26S65 20 60.5 14Z" fill="#ff9800"/><path d="M72.5 14C68 20 69 26 72.5 26S77 20 72.5 14Z" fill="#ff9800"/><rect x="32" y="46" width="56" height="26" rx="5" fill="#f8bbd0"/><rect x="22" y="72" width="76" height="28" rx="5" fill="#f48fb1"/><path d="M32 50q6 9 12 0t12 0 12 0 12 0 8 0V46H32Z" fill="#fff"/><path d="M22 76q6.5 9 13 0t13 0 13 0 13 0 13 0 10 0V72H22Z" fill="#fff"/><rect x="12" y="100" width="96" height="8" rx="4" fill="#b0bec5"/></svg>`,
+    hearts: `<svg viewBox="0 0 120 120"><path d="M50 104C10 72 6 42 26 32 40 26 50 34 50 42 52 34 62 26 76 32 96 42 92 72 50 104Z" fill="#c2185b"/><path d="M88 96C66 78 64 62 74 56 82 52 88 57 88 61 90 57 96 52 104 56 114 62 112 78 88 96Z" fill="#e57399"/><path d="M28 44C30 38 36 36 40 38" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/></svg>`,
+    pumpkin: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="72" rx="46" ry="36" fill="#e8791a"/><ellipse cx="38" cy="72" rx="24" ry="36" fill="#f28c2a" stroke="#c9600f" stroke-width="2"/><ellipse cx="82" cy="72" rx="24" ry="36" fill="#f28c2a" stroke="#c9600f" stroke-width="2"/><ellipse cx="60" cy="72" rx="15" ry="36" fill="#f7a648" stroke="#c9600f" stroke-width="2"/><rect x="55" y="26" width="10" height="18" rx="3" fill="#5d4037"/><path d="M65 36C80 24 96 30 96 40 84 42 74 44 65 40Z" fill="#558b2f"/></svg>`,
+    drumstick: `<svg viewBox="0 0 120 120"><path d="M58 76L96 106" stroke="#b9a98d" stroke-width="14" stroke-linecap="round"/><circle cx="98" cy="101" r="8.5" fill="#b9a98d"/><circle cx="106" cy="110" r="8.5" fill="#b9a98d"/><path d="M58 76L96 106" stroke="#f5efe6" stroke-width="10" stroke-linecap="round"/><circle cx="98" cy="101" r="6.5" fill="#f5efe6"/><circle cx="106" cy="110" r="6.5" fill="#f5efe6"/><path d="M22 60C22 30 50 12 74 22 98 32 94 66 68 78 50 86 22 86 22 60Z" fill="#c1762b"/><path d="M34 52C36 38 50 30 62 32" fill="none" stroke="#e6a75c" stroke-width="6" stroke-linecap="round"/></svg>`,
+    glasses: `<svg viewBox="0 0 120 120"><g transform="translate(-4 6) rotate(14 40 98)"><path d="M26 18H54C54 48 48 60 40 60 32 60 26 48 26 18Z" fill="#eef0fb" stroke="#5c6bc0" stroke-width="2.5"/><path d="M28 34H52C51 50 47 58 40 58 33 58 29 50 28 34Z" fill="#a02c4d"/><path d="M40 60V96" stroke="#5c6bc0" stroke-width="3"/><path d="M28 98H52" stroke="#5c6bc0" stroke-width="4" stroke-linecap="round"/></g><g transform="translate(44 6) rotate(-14 40 98)"><path d="M26 18H54C54 48 48 60 40 60 32 60 26 48 26 18Z" fill="#eef0fb" stroke="#5c6bc0" stroke-width="2.5"/><path d="M28 34H52C51 50 47 58 40 58 33 58 29 50 28 34Z" fill="#d9a441"/><path d="M40 60V96" stroke="#5c6bc0" stroke-width="3"/><path d="M28 98H52" stroke="#5c6bc0" stroke-width="4" stroke-linecap="round"/></g></svg>`,
+    cloche: `<svg viewBox="0 0 120 120"><path d="M16 88C16 46 40 32 60 32S104 46 104 88Z" fill="#cfd8dc" stroke="#78909c" stroke-width="3"/><path d="M28 78C30 58 42 46 56 44" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/><circle cx="60" cy="26" r="7" fill="#90a4ae"/><rect x="8" y="88" width="104" height="8" rx="4" fill="#90a4ae"/></svg>`,
+  };
+  const OCCASIONS = [
+    { id: "xmas",    label: "Christmas",          title: "Christmas dinner",    art: "santa",     paper: "#f4f6f1", main: "#1f4d3a", soft: "#dfe9e2", accent: "#a8223a", line: "#c5d0c9" },
+    { id: "easter",  label: "Easter",             title: "Easter Sunday lunch", art: "egg",       paper: "#f9f7fc", main: "#5b4a9e", soft: "#ebe5f6", accent: "#a34a0a", line: "#d6cfe6" },
+    { id: "bday",    label: "Birthday",           title: "Birthday meal",       art: "cake",      paper: "#fff8fb", main: "#b0164f", soft: "#fbe3ed", accent: "#1259a8", line: "#ecd0dc" },
+    { id: "anniv",   label: "Anniversary",        title: "Anniversary dinner",  art: "hearts",    paper: "#fbf6f6", main: "#8e1b3a", soft: "#f5e0e5", accent: "#8a6508", line: "#e6cfd4" },
+    { id: "valent",  label: "Valentine's Day",    title: "Valentine's dinner",  art: "hearts",    paper: "#fbf6f6", main: "#a11543", soft: "#f8dde7", accent: "#6e2b8c", line: "#ecd0da" },
+    { id: "thanks",  label: "Thanksgiving",       title: "Thanksgiving dinner", art: "pumpkin",   paper: "#fbf7f1", main: "#9c4a12", soft: "#f5e5d5", accent: "#6b2a10", line: "#e5d3c2" },
+    { id: "sunday",  label: "Sunday roast",       title: "Sunday roast",        art: "drumstick", paper: "#f8f5f1", main: "#5a3e2b", soft: "#ece2d8", accent: "#a04d0f", line: "#d9cec3" },
+    { id: "party",   label: "Dinner party",       title: "Dinner party",        art: "glasses",   paper: "#f5f6fa", main: "#1f2a5c", soft: "#dde2f3", accent: "#8c5a10", line: "#cfd5e4" },
+    { id: "other",   label: "Something else",     title: "Special meal",        art: "cloche",    paper: "#f3f7f7", main: "#14625e", soft: "#d9ecea", accent: "#a63a1e", line: "#c6d8d6" },
+  ];
+
+  // Minutes allowed to finish a task before a Time Out starts (the "Time to finish each task first" setting).
+  const allowance = () => Math.min(60, Math.max(0, Math.round(parseFloat($("tmallow").value) || 0)));
+  const UNLOCK_LEAD = 15;   // in cooking mode, a recipe unlocks this many minutes before its first step is due
+
   const $ = id => document.getElementById(id);
   const pad = n => String(n).padStart(2, "0");
   const fmtTime = d => pad(d.getHours()) + ":" + pad(d.getMinutes());
   const fmtDay = d => d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
   const sameDay = (a, b) => a.toDateString() === b.toDateString();
   const roundMin = n => Math.round(n);
+  const fmtWhen = d => sameDay(d, new Date()) ? fmtTime(d) : fmtDay(d) + " " + fmtTime(d);
+
+  let cooking = false;      // cooking mode: recipes for later steps are locked until due
+  let lastPlan = null;
+  let pendingRid = null, rvOpen = false, rvPushed = false, savedY = 0;
+  const done = new Set();   // steps ticked off in cooking mode
+  const tmPick = [];        // Time Out gaps chosen by hand
+
+  // Shopping list state. Only store cupboard removals are remembered between visits (light per-device convenience).
+  const REMOVED_KEY = "mealplanner.shop.removed";
+  const extras = [];        // things the user adds to the shopping list by hand
+  let extraId = 0;
+  const removed = (function () {
+    try {
+      const v = JSON.parse(localStorage.getItem(REMOVED_KEY) || "[]");
+      return new Set(Array.isArray(v) ? v.filter(k => ITEMS[k] && ITEMS[k].cat === CUPBOARD) : []);
+    } catch (e) { return new Set(); }
+  })();
+  function saveRemoved() {
+    try { localStorage.setItem(REMOVED_KEY, JSON.stringify(Array.from(removed).filter(k => ITEMS[k] && ITEMS[k].cat === CUPBOARD))); } catch (e) { /* storage unavailable: carry on */ }
+  }
 
   function num(id, fallback) {
     const v = parseFloat($(id).value);
@@ -358,7 +724,7 @@
     }
     SIDES.forEach(g => g.items.forEach(side => {
       if (!side.on) return;
-      side.steps.forEach(st => items.push({ name: st.name.replace("{dish}", dish.toLowerCase()), note: st.note, recipe: st.recipe || "", oven: Number(st.oven) || 0, before: Number(st.mins) || 0 }));
+      side.steps.forEach(st => items.push({ name: st.name.replace("{dish}", dish.toLowerCase()), note: st.note, recipe: st.recipe || "", rid: side.rid || null, oven: Number(st.oven) || 0, before: Number(st.mins) || 0 }));
     }));
     customs.forEach(t => items.push({ name: t.name, note: t.note, recipe: t.recipe || "", before: Number(t.mins) || 0 }));
     items.push({ name: "Time to eat", before: 0, serve: true });
@@ -374,10 +740,44 @@
     }
     items.sort((a, b) => b.before - a.before);
     items.forEach(i => { i.when = new Date(serve.getTime() - i.before * 60000); });
-    return { serve, items, kg, cook, rest, fixed, dish };
+
+    // Time Outs: gaps between one task and the next, after allowing time to finish the first task.
+    const tmMin = Math.max(5, num("tmmin", 20));
+    const allow = allowance();
+    const gaps = [];
+    for (let k = 0; k < items.length - 1; k++) {
+      const a = items[k], b = items[k + 1];
+      const mins = a.before - b.before - allow;
+      if (mins >= 10) gaps.push({ key: a.name + "|" + b.name, prev: a, next: b, mins: mins, start: new Date(a.when.getTime() + allow * 60000) });
+    }
+    const eligible = gaps.filter(g => g.mins >= tmMin);
+    const byLength = (x, y) => y.mins - x.mins;
+    const chosen = ($("tmmode").value === "manual"
+      ? eligible.filter(g => tmPick.indexOf(g.key) >= 0)
+      : eligible.slice()).sort(byLength).slice(0, 2);
+    // A fixed task halfway down the timeline. It is not in the editor, so it can't be removed, and it never
+    // lands inside a Time Out: if the halfway point falls in one, it moves to just before that Time Out starts.
+    if (items.length >= 2) {
+      const m = Math.floor(items.length / 2), a = items[m - 1], b = items[m];
+      let before = Math.round((a.before + b.before) / 2);
+      let at = new Date(serve.getTime() - before * 60000);
+      if (chosen.some(g => at.getTime() >= g.start.getTime() && at.getTime() < g.next.when.getTime())) {
+        before = a.before;
+        at = new Date(serve.getTime() - before * 60000);
+      }
+      items.push({ name: "Post how great this app is on Social Media!", note: "", before: before, when: at, fixed: true });
+    }
+    chosen.forEach(g => items.push({
+      name: "Time out: " + fmtDur(g.mins) + " until the next task", note: "Next: " + g.next.name + " at " + fmtTime(g.next.when),
+      timeout: true, mins: g.mins, nextName: g.next.name, nextWhen: g.next.when,
+      before: g.prev.before - allow, when: g.start, end: g.next.when,
+    }));
+    items.sort((a, b) => b.before - a.before);
+    return { serve, items, kg, cook, rest, fixed, dish, gaps, chosen, tmMin };
   }
 
   function esc2(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function md(s) { return esc2(s).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>"); }
 
   function unitWrap(input, unit) {
     const wrap = document.createElement("div"); wrap.className = "unit-field";
@@ -403,10 +803,305 @@
     return ((h ? h + " hr " : "") + (r ? r + " min" : "")).trim();
   }
 
+  // Recipe quantities. Amounts are written for 8 people and scaled by f = people / 8.
+  const FR = ["", "\u215B", "\u00BC", "\u215C", "\u00BD", "\u215D", "\u00BE", "\u215E"];
+  function fmtFrac(x) {
+    let w = Math.floor(x + 1e-9), e = Math.round((x - w) * 8);
+    if (e === 8) { w += 1; e = 0; }
+    return (w ? String(w) : (e ? "" : "0")) + FR[e];
+  }
+  function fmtQty(ing, f) {
+    if (ing.base == null) return ing.text || "";
+    const vals = [].concat(ing.base).map(b => b * f);
+    let out, label;
+    if (ing.unit === "g") {
+      const v = vals[0];
+      if (v >= 1000) { out = String(parseFloat((Math.round(v / 50) * 50 / 1000).toFixed(2))); label = "kg"; }
+      else { out = String(v < 100 ? Math.max(1, Math.round(v)) : Math.round(v / 5) * 5); label = "g"; }
+    } else {
+      const U = UNITS[ing.unit];
+      const snap = v => Math.max(U.step, Math.round(v / U.step) * U.step);
+      out = vals.map(v => fmtFrac(snap(v))).join("\u2013");
+      label = U.many ? (snap(vals[vals.length - 1]) > 1 ? U.many : U.one) : U.label;
+    }
+    return (ing.pre || "") + out + " " + label;
+  }
+
+  // ---- Shopping list ---------------------------------------------------------------------------------------
+  // Formats a shopping amount (lo to hi, in the given unit) the way you would say it in a shop.
+  function shopAmt(unit, lo, hi) {
+    const one = v => {
+      if (unit === "g") {
+        if (v >= 1000) return [String(parseFloat((Math.round(v / 50) * 50 / 1000).toFixed(2))), "kg"];
+        return [String(v < 100 ? Math.max(1, Math.round(v)) : Math.round(v / 5) * 5), "g"];
+      }
+      if (unit === "ml") {
+        if (v >= 1000) return [String(parseFloat((Math.round(v / 50) * 50 / 1000).toFixed(2))), "L"];
+        return [String(v < 100 ? Math.max(1, Math.round(v)) : Math.round(v / 10) * 10), "ml"];
+      }
+      if (unit === "tbsp" || unit === "tsp") {
+        const st = unit === "tbsp" ? 0.25 : 0.125;
+        return [fmtFrac(Math.max(st, Math.round(v / st) * st)), unit];
+      }
+      if (unit === "each") return [String(Math.max(1, Math.ceil(v - 1e-9))), ""];
+      if (unit === "clove") { const n = Math.max(1, Math.ceil(v - 1e-9)); return [String(n), n === 1 ? "clove" : "cloves"]; }
+      if (unit === "nutmeg") { const n = Math.max(1, Math.ceil(v - 1e-9)); return [String(n), n === 1 ? "whole nutmeg" : "whole nutmegs"]; }
+      return [String(v), unit];
+    };
+    const a = one(lo), b = one(hi);
+    if (a[0] === b[0] && a[1] === b[1]) return (a[0] + " " + a[1]).trim();
+    if (a[1] === b[1]) return (a[0] + "\u2013" + b[0] + " " + a[1]).trim();
+    return (a[0] + " " + a[1] + " \u2013 " + b[0] + " " + b[1]).trim();
+  }
+
+  function sideIngredients(side) {
+    return side.rid && RECIPES[side.rid] ? RECIPES[side.rid].ingredients : (SHOPDATA[side.id] || []);
+  }
+
+  // Adds up every ingredient for the main dish and the ticked sides into one list, merging the same item.
+  function buildShop() {
+    const f = people() / 8, lines = new Map();
+    function add(item, unit, lo, hi, src) {
+      if (!ITEMS[item]) return;
+      const key = item + "|" + (unit || "text");
+      let l = lines.get(key);
+      if (!l) {
+        const it = ITEMS[item];
+        l = { key: key, rkey: item, item: item, name: it.name, cat: it.cat, note: it.note || "", unit: unit, lo: 0, hi: 0, from: [] };
+        lines.set(key, l);
+      }
+      l.lo += lo; l.hi += hi;
+      if (src && l.from.indexOf(src) < 0) l.from.push(src);
+    }
+    SIDES.forEach(g => g.items.forEach(side => {
+      if (!side.on) return;
+      sideIngredients(side).forEach(ing => {
+        if (ing.base == null) { (ing.items || [ing.item]).forEach(k => add(k, null, 0, 0, side.name)); return; }
+        const b = [].concat(ing.base);
+        let lo = b[0] * f, hi = b[b.length - 1] * f, unit = ing.unit;
+        const eg = ITEMS[ing.item] && ITEMS[ing.item].eachG;
+        if (unit === "g" && eg) { lo /= eg; hi /= eg; unit = "each"; }
+        add(ing.item, unit, lo, hi, side.name);
+      });
+    }));
+    const haveQty = new Set();
+    lines.forEach(l => { if (l.unit) haveQty.add(l.item); });
+    const out = [];
+    lines.forEach(l => {
+      if (!l.unit && haveQty.has(l.item)) return;   // "to taste" is covered by a real amount
+      l.qty = l.unit ? shopAmt(l.unit, l.lo, l.hi) : "";
+      out.push(l);
+    });
+    const w = num("weight", 0);
+    if (w > 0) out.push({ key: "main", rkey: "main", name: dishName(), cat: "The main dish", note: "", from: [], qty: Number(w.toFixed(1)) + " " + $("unit").value });
+    extras.forEach(x => out.push({ key: "x" + x.id, rkey: "x" + x.id, name: x.name, cat: "Your extras", note: "", from: [], qty: x.qty, extra: true }));
+    out.sort((a, b) => SHOP_CATS.indexOf(a.cat) - SHOP_CATS.indexOf(b.cat) || a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+    return out;
+  }
+
+  function shopRow(l, isGone) {
+    const row = document.createElement("div"); row.className = "shoprow" + (isGone ? " gone" : "");
+    const q = document.createElement("span");
+    q.className = "sq" + (l.qty ? "" : " dim");
+    q.textContent = l.qty || (l.extra ? "" : "As needed");
+    const n = document.createElement("div"); n.className = "sn";
+    const b = document.createElement("b"); b.textContent = l.name; n.appendChild(b);
+    const bits = [];
+    if (l.note) bits.push(l.note);
+    if (l.from && l.from.length && !(l.from.length === 1 && l.from[0].toLowerCase() === l.name.toLowerCase())) bits.push("For: " + l.from.join(", "));
+    if (bits.length) { const s = document.createElement("small"); s.textContent = bits.join(" \u00B7 "); n.appendChild(s); }
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "small noprint" + (isGone ? "" : " danger");
+    btn.textContent = isGone ? "Put back" : "Remove";
+    btn.setAttribute("aria-label", (isGone ? "Put back on the list: " : "Remove from the list: ") + l.name);
+    btn.addEventListener("click", () => {
+      const rows = Array.from((isGone ? $("gonelist") : $("shoplist")).querySelectorAll(".shoprow"));
+      const at = rows.indexOf(row);
+      if (isGone) removed.delete(l.rkey); else removed.add(l.rkey);
+      saveRemoved();
+      renderShop();
+      const again = Array.from((isGone ? $("gonelist") : $("shoplist")).querySelectorAll(".shoprow button"));
+      const target = again[Math.min(at, again.length - 1)];
+      if (target) target.focus(); else $("shopsum").focus();
+    });
+    row.append(q, n, btn);
+    return row;
+  }
+
+  function renderShop() {
+    const all = buildShop();
+    const live = all.filter(l => !removed.has(l.rkey)), gone = all.filter(l => removed.has(l.rkey));
+    const host = $("shoplist");
+    host.innerHTML = "";
+    SHOP_CATS.forEach(cat => {
+      const rows = live.filter(l => l.cat === cat);
+      if (!rows.length) return;
+      const h = document.createElement("h3"); h.className = "shopcat"; h.textContent = cat;
+      if (cat === CUPBOARD) { const s = document.createElement("small"); s.textContent = "Check what you already have"; h.appendChild(s); }
+      host.appendChild(h);
+      const box = document.createElement("div"); box.className = "shopgroup";
+      rows.forEach(l => box.appendChild(shopRow(l, false)));
+      host.appendChild(box);
+    });
+    if (!live.length) {
+      const p = document.createElement("p"); p.className = "hint"; p.textContent = "Nothing on your list. Tick some dishes above, or put removed items back.";
+      host.appendChild(p);
+    }
+    const gl = $("gonelist");
+    gl.innerHTML = "";
+    gone.forEach(l => gl.appendChild(shopRow(l, true)));
+    $("removedbox").hidden = !gone.length;
+    $("removedsum").textContent = "Removed from your list (" + gone.length + ")";
+    $("shopsum").textContent = live.length + (live.length === 1 ? " item" : " items") + " to buy for " + people() + (people() === 1 ? " person" : " people")
+      + (gone.length ? " \u00B7 " + gone.length + " removed" : "");
+    $("btn-nocup").disabled = !live.some(l => l.cat === CUPBOARD);
+    $("btn-restore").disabled = !gone.length;
+  }
+
+  function shopText() {
+    const live = buildShop().filter(l => !removed.has(l.rkey));
+    if (!live.length) return "";
+    let out = "Shopping list: " + mealTitle() + " for " + people() + (people() === 1 ? " person" : " people");
+    SHOP_CATS.forEach(cat => {
+      const rows = live.filter(l => l.cat === cat);
+      if (!rows.length) return;
+      out += "\n\n" + cat.toUpperCase();
+      rows.forEach(l => { out += "\n- " + (l.qty ? l.qty + " " : "") + l.name + (!l.qty && !l.extra ? " (as needed)" : ""); });
+    });
+    return out;
+  }
+
+  async function copyShop() {
+    const text = shopText();
+    if (!text) { toast("Your shopping list is empty"); return; }
+    try {
+      if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) { await navigator.share({ text }); return; }
+      await navigator.clipboard.writeText(text);
+      toast("Shopping list copied");
+    } catch (e) { toast("Couldn't copy. Try Print instead."); }
+  }
+
+  function printShop() {
+    document.body.classList.add("print-shop");
+    window.print();
+  }
+  window.addEventListener("afterprint", () => document.body.classList.remove("print-shop"));
+
+  function addExtra() {
+    const name = $("xname").value.trim();
+    if (!name) { toast("Type what you need first"); $("xname").focus(); return; }
+    extras.push({ id: ++extraId, name: name, qty: $("xqty").value.trim() });
+    $("xname").value = ""; $("xqty").value = "";
+    renderShop();
+    $("xname").focus();
+  }
+
+  // ---- Recipe screen -------------------------------------------------------------------------
+  function renderRecipe(rid) {
+    const r = RECIPES[rid], n = people(), f = n / 8;
+    const steps = lastPlan ? lastPlan.items.filter(i => i.rid === rid) : [];
+    let h = '<h1 id="rv-title">' + esc2(r.title) + "</h1>";
+    h += '<p class="rv-meta">Serves ' + n + (n === 8 ? "" : " (scaled from 8)") + " \u00B7 Oven: " + esc2(r.oven) + (r.equipment ? " \u00B7 " + esc2(r.equipment) : "") + "</p>";
+    if (steps.length) h += '<div class="rv-box"><b>Where it fits in your plan</b><ul>' + steps.map(s => "<li>" + esc2(fmtWhen(s.when)) + " \u2013 " + esc2(s.name) + "</li>").join("") + "</ul></div>";
+    h += "<h2>Ingredients</h2><ul class=\"ing\">" + r.ingredients.map(g => '<li><span class="q">' + esc2(fmtQty(g, f)) + "</span><span>" + esc2(g.name) + "</span></li>").join("") + "</ul>";
+    h += '<h2>Method</h2><ol class="method">' + r.method.map(s => "<li>" + md(s) + "</li>").join("") + "</ol>";
+    if (r.makeAhead && r.makeAhead.length) {
+      h += "<h2>Make ahead</h2>" + (r.makeAhead.length > 1 ? '<ul class="plain">' + r.makeAhead.map(s => "<li>" + md(s) + "</li>").join("") + "</ul>" : "<p>" + md(r.makeAhead[0]) + "</p>");
+    }
+    if (r.tip) h += "<h2>Tip</h2><p>" + md(r.tip) + "</p>";
+    if (r.serveWith) h += "<h2>Serve with</h2><p>" + md(r.serveWith) + "</p>";
+    $("rv-body").innerHTML = h;
+  }
+
+  function openRecipeView(rid, push) {
+    renderRecipe(rid);
+    $("appmain").hidden = true;
+    $("recipeview").hidden = false;
+    rvOpen = true;
+    window.scrollTo(0, 0);
+    if (push) {
+      try { history.pushState({ recipe: rid }, "", "#recipe-" + rid); rvPushed = true; } catch (e) { rvPushed = false; }
+    }
+    $("rv-back").focus();
+  }
+
+  function showRecipe(rid) {
+    if (!RECIPES[rid]) return;
+    savedY = window.scrollY;
+    pendingRid = rid;
+    openRecipeView(rid, true);
+  }
+
+  function closeRecipeView() {
+    if (!rvOpen) return;
+    $("recipeview").hidden = true;
+    $("appmain").hidden = false;
+    rvOpen = false;
+    window.scrollTo(0, savedY);
+    const link = pendingRid && document.querySelector('.reclink[data-rid="' + pendingRid + '"]');
+    if (link) link.focus({ preventScroll: true });
+  }
+
+  function backToTimeline() {
+    if (rvPushed) { rvPushed = false; try { history.back(); return; } catch (e) { /* fall through */ } }
+    closeRecipeView();
+  }
+
+  window.addEventListener("popstate", e => {
+    if (rvOpen) { rvPushed = false; closeRecipeView(); }
+    else if (e.state && e.state.recipe && RECIPES[e.state.recipe]) { rvPushed = true; openRecipeView(e.state.recipe, false); }
+  });
+
+  // ---- Soft lock for recipes in cooking mode ----------------------------------------------------
+  function firstStep(rid) {
+    if (!lastPlan) return null;
+    const ts = lastPlan.items.filter(i => i.rid === rid).map(i => i.when.getTime());
+    return ts.length ? new Date(Math.min.apply(null, ts)) : null;
+  }
+  function isLocked(rid) {
+    if (!cooking) return false;
+    const d = firstStep(rid);
+    return !!d && Date.now() < d.getTime() - UNLOCK_LEAD * 60000;
+  }
+  function applyLink(btn) {
+    const rid = btn.dataset.rid, r = RECIPES[rid];
+    if (isLocked(rid)) {
+      const open = new Date(firstStep(rid).getTime() - UNLOCK_LEAD * 60000);
+      btn.classList.add("locked");
+      btn.textContent = "\uD83D\uDD12 " + r.title + " opens at " + fmtWhen(open);
+    } else {
+      btn.classList.remove("locked");
+      btn.textContent = "\uD83D\uDCD6 Recipe: " + r.title;
+    }
+  }
+  function recipeLink(rid) {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "small reclink"; btn.dataset.rid = rid;
+    btn.addEventListener("click", () => onRecipeClick(rid));
+    applyLink(btn);
+    return btn;
+  }
+  function onRecipeClick(rid) {
+    if (!isLocked(rid)) { showRecipe(rid); return; }
+    const first = firstStep(rid);
+    const mins = Math.max(1, Math.ceil((first.getTime() - Date.now()) / 60000));
+    const msg = RECIPES[rid].title + " isn't needed until " + fmtWhen(first) + ", which is in " + fmtDur(mins) + ".";
+    pendingRid = rid;
+    const dlg = $("lockdlg");
+    if (typeof dlg.showModal === "function") {
+      $("locktxt").textContent = msg + " Looking ahead is fine, but you may be getting ahead of yourself. View it now?";
+      dlg.showModal();
+    } else if (window.confirm(msg + " View it now?")) { showRecipe(rid); }
+  }
+
+  // ---- Timeline --------------------------------------------------------------------------------
   function render() {
     const plan = buildPlan();
-    const tl = $("timeline"), sm = $("summary");
-    tl.innerHTML = "";
+    lastPlan = plan;
+    const sm = $("summary");
+    renderGaps(plan);
+    renderTimeline(plan);
+    renderShop();
     if (!plan) { sm.textContent = "Choose an eating time to see your plan."; return; }
     if (plan.cook > 0) {
       const inOven = new Date(plan.serve.getTime() - (plan.cook + plan.rest) * 60000);
@@ -418,9 +1113,16 @@
     }
     const p = PRESETS.find(x => x.id === $("preset").value);
     $("temp").textContent = p ? p.temp : "";
-    plan.items.forEach(i => {
+    updateLive();
+  }
+
+  function renderTimeline(plan) {
+    const tl = $("timeline");
+    tl.innerHTML = "";
+    if (!plan) return;
+    plan.items.forEach((i, idx) => {
       const li = document.createElement("li");
-      if (i.serve) li.className = "serve"; else if (i.heat) li.className = "heat"; else if (i.key) li.className = "key";
+      li.dataset.idx = idx;
       const t = document.createElement("div");
       t.className = "time";
       t.textContent = fmtTime(i.when);
@@ -429,15 +1131,122 @@
       }
       const k = document.createElement("div");
       k.className = "task";
-      const b = document.createElement("b"); b.textContent = i.name; k.appendChild(b);
-      if (i.note) { const s = document.createElement("small"); s.textContent = i.note; k.appendChild(s); }
-      if (i.recipe) {
-        const det = document.createElement("details"); det.className = "recipe";
-        const sum = document.createElement("summary"); sum.textContent = "Recipe"; det.appendChild(sum);
-        const div = document.createElement("div"); div.textContent = i.recipe; det.appendChild(div);
-        k.appendChild(det);
+      if (i.timeout) {
+        li.className = "timeout";
+        const box = document.createElement("div"); box.className = "tobox";
+        const b = document.createElement("b"); b.textContent = "\u2615 Time out";
+        const c = document.createElement("span"); c.className = "tocount";
+        const s = document.createElement("small"); s.textContent = "Next: " + i.nextName + " at " + fmtTime(i.nextWhen);
+        box.append(b, c, s); k.appendChild(box);
+      } else {
+        if (i.serve) li.className = "serve"; else if (i.heat) li.className = "heat"; else if (i.key) li.className = "key";
+        const b = document.createElement("b"); b.textContent = i.name;
+        const pb = document.createElement("span"); pb.className = "pillbox"; b.appendChild(pb);
+        k.appendChild(b);
+        if (i.note) { const s = document.createElement("small"); s.textContent = i.note; k.appendChild(s); }
+        if (i.recipe) {
+          const det = document.createElement("details"); det.className = "recipe";
+          const sum = document.createElement("summary"); sum.textContent = "Recipe"; det.appendChild(sum);
+          const div = document.createElement("div"); div.textContent = i.recipe; det.appendChild(div);
+          k.appendChild(det);
+        }
+        if (i.rid && RECIPES[i.rid]) k.appendChild(recipeLink(i.rid));
+        if (cooking && !i.serve) {
+          const l = document.createElement("label"); l.className = "check donechk noprint";
+          const c = document.createElement("input"); c.type = "checkbox"; c.checked = done.has(i.name);
+          c.addEventListener("change", () => { if (c.checked) done.add(i.name); else done.delete(i.name); updateLive(); });
+          l.append(c, document.createTextNode("Done"));
+          k.appendChild(l);
+        }
       }
       li.appendChild(t); li.appendChild(k); tl.appendChild(li);
+    });
+  }
+
+  // Updates the live parts of the timeline in place (the clock, next-up marker, Time Out countdown, recipe locks).
+  function updateLive() {
+    if (!lastPlan) return;
+    const now = Date.now();
+    let nextIdx = -1;
+    lastPlan.items.forEach((i, idx) => { if (nextIdx < 0 && !i.timeout && !i.serve && !done.has(i.name)) nextIdx = idx; });
+    document.querySelectorAll("#timeline li").forEach(li => {
+      const idx = Number(li.dataset.idx), i = lastPlan.items[idx];
+      if (!i) return;
+      if (i.timeout) {
+        const c = li.querySelector(".tocount");
+        const active = cooking && now >= i.when.getTime() && now < i.nextWhen.getTime();
+        const left = active ? Math.ceil((i.nextWhen.getTime() - now) / 60000) : i.mins;
+        c.textContent = " \u00B7 " + fmtDur(left) + " until the next task";
+        li.classList.toggle("active", active);
+        return;
+      }
+      li.classList.toggle("done", cooking && done.has(i.name));
+      const pb = li.querySelector(".pillbox");
+      if (!pb) return;
+      pb.innerHTML = "";
+      if (cooking && idx === nextIdx) {
+        const p = document.createElement("span");
+        const late = i.when.getTime() <= now;
+        p.className = "pill" + (late ? " due" : "");
+        p.textContent = late ? "Due now" : "Next up \u00B7 in " + fmtDur(Math.max(1, Math.ceil((i.when.getTime() - now) / 60000)));
+        pb.appendChild(p);
+      }
+    });
+    document.querySelectorAll(".reclink").forEach(applyLink);
+  }
+
+  function updateCookBar() {
+    $("cookbar").classList.toggle("on", cooking);
+    $("cooktext").textContent = cooking
+      ? "Cooking mode is on. Recipes for later steps stay locked until " + UNLOCK_LEAD + " minutes before they are due. Tick steps off as you go."
+      : "Planning mode: every recipe is open. On the day, press Start cooking to lock recipes for later steps until they are due.";
+    $("btn-cook").textContent = cooking ? "Stop cooking mode" : "Start cooking";
+  }
+
+  // ---- Time Out choices ----------------------------------------------------------------------------
+  function renderGaps(plan) {
+    const host = $("gaps");
+    host.innerHTML = "";
+    if (!plan) return;
+    const manual = $("tmmode").value === "manual";
+    const list = plan.gaps.slice().sort((a, b) => b.mins - a.mins).slice(0, 6);
+    if (!list.length) {
+      const p = document.createElement("p"); p.className = "hint"; p.textContent = "There are no gaps of 10 minutes or more in this plan."; host.appendChild(p);
+      return;
+    }
+    const head = document.createElement("p"); head.className = "hint";
+    head.textContent = plan.chosen.length
+      ? "Biggest gaps in your plan. " + plan.chosen.length + " of 2 Time Outs in use."
+      : "Biggest gaps in your plan. None is at least " + plan.tmMin + " minutes, so there are no Time Outs. Lower the shortest gap to add some.";
+    host.appendChild(head);
+    list.forEach(g => {
+      const eligible = g.mins >= plan.tmMin;
+      const used = plan.chosen.some(c => c.key === g.key);
+      const row = document.createElement("div"); row.className = "gaprow" + (used ? " use" : "");
+      if (manual && eligible) {
+        const c = document.createElement("input"); c.type = "checkbox"; c.checked = used; c.dataset.key = g.key;
+        c.setAttribute("aria-label", "Use this gap as a Time Out");
+        c.addEventListener("change", () => {
+          const at = tmPick.indexOf(g.key);
+          if (c.checked) {
+            if (plan.chosen.length >= 2 && !used) { c.checked = false; toast("Two Time Outs at most. Untick one first."); return; }
+            if (at < 0) tmPick.push(g.key);
+          } else if (at >= 0) { tmPick.splice(at, 1); }
+          render();
+          document.querySelectorAll("#gaps input").forEach(x => { if (x.dataset.key === g.key) x.focus(); });
+        });
+        row.appendChild(c);
+      }
+      const tx = document.createElement("div"); tx.className = "gtxt";
+      const b = document.createElement("b"); b.textContent = fmtDur(g.mins);
+      tx.append(b, document.createTextNode(" from " + fmtTime(g.start) + " to " + fmtTime(g.next.when)));
+      const sm = document.createElement("small"); sm.textContent = "After: " + g.prev.name + ". Next: " + g.next.name + ".";
+      tx.appendChild(sm);
+      row.appendChild(tx);
+      const tag = document.createElement("span"); tag.className = "tag";
+      tag.textContent = used ? "Time Out" : (eligible ? (manual ? "" : "Not used (two at most)") : "Below your minimum");
+      if (tag.textContent) row.appendChild(tag);
+      host.appendChild(row);
     });
   }
 
@@ -486,7 +1295,8 @@
         ta.addEventListener("input", () => { st.note = ta.value; render(); });
         ed.appendChild(ta);
         const ra = document.createElement("textarea"); ra.rows = 3; ra.value = st.recipe || "";
-        ra.placeholder = "Recipe (optional)"; ra.setAttribute("aria-label", "Recipe for " + st.name);
+        ra.placeholder = side.rid ? "Your own recipe notes (optional). The built-in recipe opens from the timeline." : "Recipe (optional)";
+        ra.setAttribute("aria-label", "Recipe for " + st.name);
         ra.addEventListener("input", () => { st.recipe = ra.value; render(); });
         ed.appendChild(ra);
       });
@@ -536,7 +1346,7 @@
     const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
     const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Special meal planner//EN", "CALSCALE:GREGORIAN"];
     plan.items.forEach((i, idx) => {
-      const end = new Date(i.when.getTime() + 5 * 60000);
+      const end = i.timeout ? i.end : new Date(i.when.getTime() + 5 * 60000);
       lines.push(
         "BEGIN:VEVENT",
         "UID:meal-" + icsDate(plan.serve) + "-" + idx + "@meal-planner",
@@ -582,7 +1392,7 @@
     } catch (e) { toast("Couldn't copy. Try Print instead."); }
   }
 
-  ["weight", "unit", "serve", "perkg", "extra", "rest", "dish", "mainnote", "mainrecipe", "ovenc", "warm", "ovenrem"].forEach(id => {
+  ["weight", "unit", "serve", "perkg", "extra", "rest", "dish", "mainnote", "mainrecipe", "ovenc", "warm", "ovenrem", "tmmin", "tmmode", "tmallow"].forEach(id => {
     $(id).addEventListener("input", render);
     $(id).addEventListener("change", render);
   });
@@ -597,30 +1407,29 @@
   $("btn-ics").addEventListener("click", downloadIcs);
   $("btn-copy").addEventListener("click", copyChecklist);
   $("btn-print").addEventListener("click", () => window.print());
+  $("btn-shopcopy").addEventListener("click", copyShop);
+  $("btn-shopprint").addEventListener("click", printShop);
+  $("btn-nocup").addEventListener("click", () => {
+    let n = 0;
+    buildShop().forEach(l => { if (l.cat === CUPBOARD && !removed.has(l.rkey)) { removed.add(l.rkey); n++; } });
+    saveRemoved(); renderShop();
+    toast(n + (n === 1 ? " store cupboard item removed" : " store cupboard items removed"));
+  });
+  $("btn-restore").addEventListener("click", () => { removed.clear(); saveRemoved(); renderShop(); toast("Everything is back on the list"); });
+  $("btn-xadd").addEventListener("click", addExtra);
+  ["xname", "xqty"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addExtra(); } }));
   $("btn-add").addEventListener("click", () => { customs.push({ name: "New step", mins: 30, note: "", recipe: "" }); renderEditor(); render(); });
+  $("btn-cook").addEventListener("click", () => {
+    cooking = !cooking;
+    updateCookBar();
+    render();
+    toast(cooking ? "Cooking mode on" : "Back to planning mode");
+  });
+  $("rv-back").addEventListener("click", backToTimeline);
+  $("rv-back2").addEventListener("click", backToTimeline);
+  $("lock-no").addEventListener("click", () => $("lockdlg").close());
+  $("lock-yes").addEventListener("click", () => { const rid = pendingRid; $("lockdlg").close(); if (rid) showRecipe(rid); });
 
-  // Occasions: title, colour theme and a drawn picture for each.
-  const ART = {
-    santa: `<svg viewBox="0 0 120 120"><path d="M20 58C20 100 44 114 60 114S100 100 100 58Z" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><ellipse cx="60" cy="58" rx="30" ry="24" fill="#f6c9a8"/><path d="M24 48C22 16 58 4 84 16 98 24 94 42 96 48Z" fill="#c62828"/><rect x="20" y="40" width="80" height="15" rx="7.5" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><circle cx="90" cy="14" r="9" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><circle cx="48" cy="60" r="3.2" fill="#222"/><circle cx="72" cy="60" r="3.2" fill="#222"/><circle cx="40" cy="68" r="5" fill="#ef9a9a" opacity=".7"/><circle cx="80" cy="68" r="5" fill="#ef9a9a" opacity=".7"/><circle cx="60" cy="68" r="5.5" fill="#e57373"/><path d="M60 76C50 66 32 72 36 82 42 90 56 86 60 78 64 86 78 90 84 82 88 72 70 66 60 76Z" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><path d="M52 92Q60 98 68 92" fill="none" stroke="#c62828" stroke-width="3" stroke-linecap="round"/></svg>`,
-    egg: `<svg viewBox="0 0 120 120"><defs><clipPath id="egg"><path d="M60 8C88 8 102 54 102 78 102 100 84 114 60 114 36 114 18 100 18 78 18 54 32 8 60 8Z"/></clipPath></defs><g clip-path="url(#egg)"><rect width="120" height="120" fill="#f5e6ff"/><path d="M0 50L15 42 30 50 45 42 60 50 75 42 90 50 105 42 120 50V64L105 56 90 64 75 56 60 64 45 56 30 64 15 56 0 64Z" fill="#7e57c2"/><rect y="76" width="120" height="14" fill="#ffb74d"/><circle cx="32" cy="102" r="5" fill="#f06292"/><circle cx="60" cy="102" r="5" fill="#f06292"/><circle cx="88" cy="102" r="5" fill="#f06292"/><circle cx="45" cy="24" r="4" fill="#ffb74d"/><circle cx="75" cy="24" r="4" fill="#f06292"/></g><path d="M60 8C88 8 102 54 102 78 102 100 84 114 60 114 36 114 18 100 18 78 18 54 32 8 60 8Z" fill="none" stroke="#7e57c2" stroke-width="3"/></svg>`,
-    cake: `<svg viewBox="0 0 120 120"><rect x="46" y="28" width="5" height="18" rx="2" fill="#ffd54f"/><rect x="58" y="28" width="5" height="18" rx="2" fill="#4fc3f7"/><rect x="70" y="28" width="5" height="18" rx="2" fill="#ffd54f"/><path d="M48.5 14C44 20 45 26 48.5 26S53 20 48.5 14Z" fill="#ff9800"/><path d="M60.5 14C56 20 57 26 60.5 26S65 20 60.5 14Z" fill="#ff9800"/><path d="M72.5 14C68 20 69 26 72.5 26S77 20 72.5 14Z" fill="#ff9800"/><rect x="32" y="46" width="56" height="26" rx="5" fill="#f8bbd0"/><rect x="22" y="72" width="76" height="28" rx="5" fill="#f48fb1"/><path d="M32 50q6 9 12 0t12 0 12 0 12 0 8 0V46H32Z" fill="#fff"/><path d="M22 76q6.5 9 13 0t13 0 13 0 13 0 13 0 10 0V72H22Z" fill="#fff"/><rect x="12" y="100" width="96" height="8" rx="4" fill="#b0bec5"/></svg>`,
-    hearts: `<svg viewBox="0 0 120 120"><path d="M50 104C10 72 6 42 26 32 40 26 50 34 50 42 52 34 62 26 76 32 96 42 92 72 50 104Z" fill="#c2185b"/><path d="M88 96C66 78 64 62 74 56 82 52 88 57 88 61 90 57 96 52 104 56 114 62 112 78 88 96Z" fill="#e57399"/><path d="M28 44C30 38 36 36 40 38" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/></svg>`,
-    pumpkin: `<svg viewBox="0 0 120 120"><ellipse cx="60" cy="72" rx="46" ry="36" fill="#e8791a"/><ellipse cx="38" cy="72" rx="24" ry="36" fill="#f28c2a" stroke="#c9600f" stroke-width="2"/><ellipse cx="82" cy="72" rx="24" ry="36" fill="#f28c2a" stroke="#c9600f" stroke-width="2"/><ellipse cx="60" cy="72" rx="15" ry="36" fill="#f7a648" stroke="#c9600f" stroke-width="2"/><rect x="55" y="26" width="10" height="18" rx="3" fill="#5d4037"/><path d="M65 36C80 24 96 30 96 40 84 42 74 44 65 40Z" fill="#558b2f"/></svg>`,
-    drumstick: `<svg viewBox="0 0 120 120"><path d="M58 76L96 106" stroke="#b9a98d" stroke-width="14" stroke-linecap="round"/><circle cx="98" cy="101" r="8.5" fill="#b9a98d"/><circle cx="106" cy="110" r="8.5" fill="#b9a98d"/><path d="M58 76L96 106" stroke="#f5efe6" stroke-width="10" stroke-linecap="round"/><circle cx="98" cy="101" r="6.5" fill="#f5efe6"/><circle cx="106" cy="110" r="6.5" fill="#f5efe6"/><path d="M22 60C22 30 50 12 74 22 98 32 94 66 68 78 50 86 22 86 22 60Z" fill="#c1762b"/><path d="M34 52C36 38 50 30 62 32" fill="none" stroke="#e6a75c" stroke-width="6" stroke-linecap="round"/></svg>`,
-    glasses: `<svg viewBox="0 0 120 120"><g transform="translate(-4 6) rotate(14 40 98)"><path d="M26 18H54C54 48 48 60 40 60 32 60 26 48 26 18Z" fill="#eef0fb" stroke="#5c6bc0" stroke-width="2.5"/><path d="M28 34H52C51 50 47 58 40 58 33 58 29 50 28 34Z" fill="#a02c4d"/><path d="M40 60V96" stroke="#5c6bc0" stroke-width="3"/><path d="M28 98H52" stroke="#5c6bc0" stroke-width="4" stroke-linecap="round"/></g><g transform="translate(44 6) rotate(-14 40 98)"><path d="M26 18H54C54 48 48 60 40 60 32 60 26 48 26 18Z" fill="#eef0fb" stroke="#5c6bc0" stroke-width="2.5"/><path d="M28 34H52C51 50 47 58 40 58 33 58 29 50 28 34Z" fill="#d9a441"/><path d="M40 60V96" stroke="#5c6bc0" stroke-width="3"/><path d="M28 98H52" stroke="#5c6bc0" stroke-width="4" stroke-linecap="round"/></g></svg>`,
-    cloche: `<svg viewBox="0 0 120 120"><path d="M16 88C16 46 40 32 60 32S104 46 104 88Z" fill="#cfd8dc" stroke="#78909c" stroke-width="3"/><path d="M28 78C30 58 42 46 56 44" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/><circle cx="60" cy="26" r="7" fill="#90a4ae"/><rect x="8" y="88" width="104" height="8" rx="4" fill="#90a4ae"/></svg>`,
-  };
-  const OCCASIONS = [
-    { id: "xmas",    label: "Christmas",          title: "Christmas dinner",    art: "santa",     paper: "#f4f6f1", main: "#1f4d3a", soft: "#dfe9e2", accent: "#a8223a", line: "#c5d0c9" },
-    { id: "easter",  label: "Easter",             title: "Easter Sunday lunch", art: "egg",       paper: "#f9f7fc", main: "#5b4a9e", soft: "#ebe5f6", accent: "#a34a0a", line: "#d6cfe6" },
-    { id: "bday",    label: "Birthday",           title: "Birthday meal",       art: "cake",      paper: "#fff8fb", main: "#b0164f", soft: "#fbe3ed", accent: "#1259a8", line: "#ecd0dc" },
-    { id: "anniv",   label: "Anniversary",        title: "Anniversary dinner",  art: "hearts",    paper: "#fbf6f6", main: "#8e1b3a", soft: "#f5e0e5", accent: "#8a6508", line: "#e6cfd4" },
-    { id: "valent",  label: "Valentine's Day",    title: "Valentine's dinner",  art: "hearts",    paper: "#fbf6f6", main: "#a11543", soft: "#f8dde7", accent: "#6e2b8c", line: "#ecd0da" },
-    { id: "thanks",  label: "Thanksgiving",       title: "Thanksgiving dinner", art: "pumpkin",   paper: "#fbf7f1", main: "#9c4a12", soft: "#f5e5d5", accent: "#6b2a10", line: "#e5d3c2" },
-    { id: "sunday",  label: "Sunday roast",       title: "Sunday roast",        art: "drumstick", paper: "#f8f5f1", main: "#5a3e2b", soft: "#ece2d8", accent: "#a04d0f", line: "#d9cec3" },
-    { id: "party",   label: "Dinner party",       title: "Dinner party",        art: "glasses",   paper: "#f5f6fa", main: "#1f2a5c", soft: "#dde2f3", accent: "#8c5a10", line: "#cfd5e4" },
-    { id: "other",   label: "Something else",     title: "Special meal",        art: "cloche",    paper: "#f3f7f7", main: "#14625e", soft: "#d9ecea", accent: "#a63a1e", line: "#c6d8d6" },
-  ];
   function updateQuantities() {
     document.querySelectorAll("#sides [data-qty]").forEach(el => {
       const side = SIDES.flatMap(g => g.items).find(s => s.id === el.dataset.qty);
@@ -672,6 +1481,8 @@
   renderSides();
   applyPreset();
   renderEditor();
+  updateCookBar();
+  setInterval(updateLive, 20000);
 </script>
 </body>
 </html>
