@@ -177,6 +177,13 @@
   ol.method { margin: 0; padding-left: 22px; }
   ol.method li { margin-bottom: 10px; }
   #recipeview ul.plain { margin: 0; padding-left: 20px; }
+  #recipeview h3 { font: 700 17px/1.25 Georgia, serif; margin: 18px 0 8px; }
+  .rv-sec { border-top: 2px solid var(--line); margin-top: 30px; padding-top: 4px; margin-bottom: 0; }
+  .rv-sec h2 { color: var(--pine); }
+  .rv-tablewrap { overflow-x: auto; margin: 4px 0 8px; }
+  table.rv-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  .rv-table th, .rv-table td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  .rv-table th { background: var(--pine-soft); }
 
   dialog { border: 1.5px solid var(--line); border-radius: 12px; padding: 18px; max-width: 420px; width: calc(100% - 32px);
     color: var(--ink); background: var(--white); }
@@ -402,14 +409,14 @@
   // Sides and extras. Each step happens a set number of minutes before eating. {dish} becomes the main dish name.
   // per: guide quantity per person - {amt, unit, label}. unit "" = whole items, "g" grams, "ml" millilitres.
   // rid: id of the built-in recipe (see RECIPES) that the step links to.
-  // Potatoes, parsnips and red cabbage quantities come from their recipes (serves 8).
+  // Quantities for potatoes, parsnips, red cabbage, sprouts and pigs in blankets come from their recipes (serves 8).
   const SIDES = [
     { group: "Vegetables", items: [
       { id: "roasties", rid: "roasties", name: "Roast potatoes", on: true, per: { amt: 175, unit: "g", label: "potatoes" }, steps: [
         { name: "Peel and parboil the potatoes", mins: 100 }, { name: "Roast potatoes into the hot oven", mins: 60 } ] },
       { id: "parsnips", rid: "parsnips", name: "Roast parsnips", on: true, per: { amt: 112.5, unit: "g", label: "parsnips" }, steps: [ { name: "Parsnips into the oven", mins: 45 } ] },
       { id: "roastcarrots", name: "Roast carrots", per: { amt: 100, unit: "g", label: "carrots" }, steps: [ { name: "Carrots into the oven", mins: 45 } ] },
-      { id: "sprouts", name: "Brussels sprouts", on: true, per: { amt: 100, unit: "g", label: "sprouts" }, steps: [ { name: "Sprouts on to cook", mins: 12 } ] },
+      { id: "sprouts", rid: "sprouts", name: "Brussels sprouts", on: true, per: { amt: 112.5, unit: "g", label: "sprouts" }, steps: [ { name: "Sprouts on to cook", mins: 12 } ] },
       { id: "carrots", name: "Boiled carrots", per: { amt: 100, unit: "g", label: "carrots" }, steps: [ { name: "Carrots on to boil", mins: 15 } ] },
       { id: "broccoli", name: "Broccoli", per: { amt: 80, unit: "g", label: "broccoli" }, steps: [ { name: "Broccoli on to steam", mins: 8 } ] },
       { id: "peas", name: "Peas or green beans", per: { amt: 60, unit: "g", label: "peas or beans" }, steps: [ { name: "Peas or beans on to cook", mins: 6 } ] },
@@ -420,14 +427,14 @@
         { name: "Mash potatoes on to boil", mins: 35 }, { name: "Mash with butter and keep warm", mins: 10 } ] },
     ]},
     { group: "Sides", items: [
-      { id: "stuffing", name: "Stuffing", on: true, per: { amt: 100, unit: "g", label: "stuffing" }, steps: [ { name: "Stuffing into the oven", mins: 35 } ] },
-      { id: "pigs", name: "Pigs in blankets", on: true, per: { amt: 2, unit: "", label: "pigs in blankets" }, steps: [ { name: "Pigs in blankets into the oven", mins: 35 } ] },
+      { id: "stuffing", rid: "stuffing", name: "Stuffing", on: true, per: { amt: 100, unit: "g", label: "stuffing" }, steps: [ { name: "Stuffing into the oven", mins: 35 } ] },
+      { id: "pigs", rid: "pigs", name: "Pigs in blankets", on: true, per: { amt: 2.25, unit: "", label: "pigs in blankets" }, steps: [ { name: "Pigs in blankets into the oven", mins: 45 } ] },
       { id: "yorkies", name: "Yorkshire puddings", per: { amt: 2, unit: "", label: "Yorkshire puddings" }, steps: [
         { name: "Put the tin and fat in to heat", mins: 25 }, { name: "Yorkshire pudding batter into the tin", mins: 20 } ] },
-      { id: "breadsauce", name: "Bread sauce", per: { amt: 50, unit: "g", label: "bread sauce" }, steps: [ { name: "Make the bread sauce", mins: 30 } ] },
+      { id: "breadsauce", rid: "breadsauce", name: "Bread sauce", per: { amt: 50, unit: "g", label: "bread sauce" }, steps: [ { name: "Make the bread sauce", mins: 30 } ] },
     ]},
     { group: "Finishing", items: [
-      { id: "gravy", name: "Gravy", on: true, per: { amt: 60, unit: "ml", label: "gravy" }, steps: [ { name: "Make the gravy", mins: 20 } ] },
+      { id: "gravy", rid: "gravy", name: "Gravy", on: true, per: { amt: 60, unit: "ml", label: "gravy" }, steps: [ { name: "Make the gravy", mins: 20 } ] },
       { id: "plates", name: "Warm the plates", on: true, steps: [ { name: "Warm the plates", mins: 15 } ] },
       { id: "carve", name: "Carve or portion", on: true, steps: [ { name: "Carve or portion the {dish}", mins: 10 } ] },
     ]},
@@ -437,15 +444,16 @@
     "Peel and parboil the potatoes": "Cut into even chunks. Boil for about 5 minutes, drain, then shake in the colander to rough up the edges.",
     "Roast potatoes into the hot oven": "Heat the goose fat in the tin for about 5 minutes first. It should sizzle when the potatoes go in. Turn now and then.",
     "Parsnips into the oven": "Blanch for about 3 minutes and drain first. Roast for 20 to 25 minutes, turn, then roast 15 to 20 more.",
-    "Sprouts on to cook": "Boil 5 to 7 minutes. Drain well.",
+    "Sprouts on to cook": "Cook in boiling salted water for 5 to 6 minutes until just tender. Drain, add the butter and serve straight away.",
     "Red cabbage on to braise": "Cover tightly and braise for 2 to 2½ hours, stirring once or twice.",
     "Put the tin and fat in to heat": "Fat must be smoking hot before the batter goes in.",
     "Make the gravy": "Use the tray juices. Skim off the fat.",
+    "Pigs in blankets into the oven": "Cook for about 45 minutes until cooked through and crisp.",
   };
   SIDES.forEach(g => g.items.forEach(side => side.steps.forEach(st => { st.note = NOTES[st.name] || ""; st.recipe = ""; })));
   const OVENS = {
     "Roast potatoes into the hot oven": 200, "Parsnips into the oven": 200, "Carrots into the oven": 200,
-    "Cauliflower cheese into the oven": 200, "Stuffing into the oven": 200, "Pigs in blankets into the oven": 200,
+    "Cauliflower cheese into the oven": 200, "Stuffing into the oven": 200, "Pigs in blankets into the oven": 190,
     "Put the tin and fat in to heat": 220,
   };
   SIDES.forEach(g => g.items.forEach(side => side.steps.forEach(st => { st.oven = OVENS[st.name] || ""; })));
@@ -455,7 +463,12 @@
   // Ingredient: base = amount for 8 (a number, or [low, high]); unit is a key of UNITS; pre = words before the amount;
   // or text = a fixed phrase such as "to taste". In method text, **bold** marks the lead word.
   // item = the shopping list item (see ITEMS); items = several shopping list items for one line such as "Salt and pepper".
-  // To add a recipe: add an entry here, then give its side a matching rid in SIDES.
+  // heat = full heat line shown on the recipe screen (otherwise "Oven: " + oven). notes = paragraphs under the ingredients,
+  // after = paragraphs under the method, chart = a table, more = extra titled lists, sections = several recipes on one screen.
+  // unit "each" counts whole things (the name says what). mainWeight shows the weight set in "Your meal".
+  // shop = {base, unit} overrides what goes on the shopping list (for example "a generous bunch" of parsley = 1 bunch).
+  // mainIsRecipe: the recipe replaces the "buy it by weight" line on the shopping list (nut roast).
+  // To add a recipe: add an entry here, then give its side (or main dish preset) a matching rid.
   const UNITS = {
     g: {},
     tbsp: { step: 0.25, label: "tbsp" },
@@ -544,13 +557,258 @@
       ],
       serveWith: "Venison, goose or pork. Leftovers are great with sausages and mash.",
     },
+
+    turkey: {
+      title: "Roast Turkey",
+      heat: "Oven: 220°C / Fan 200°C / Gas 7 to start, then 160°C / Fan 140°C / Gas 3",
+      equipment: "Large roasting tin, foil, fine skewers, string, meat thermometer (recommended)",
+      ingredients: [
+        { name: "Oven-ready turkey (the weight you set in Your meal; this recipe is written for a 3.5–5 kg bird)", mainWeight: true },
+        { name: "Butter, softened", base: 60, unit: "g", pre: "about ", item: "butter" },
+        { name: "Lemon, thinly sliced (optional)", base: 1, unit: "each", item: "lemon" },
+        { name: "Small sprigs fresh thyme (optional)", base: [2, 3], unit: "each", item: "thyme", shop: { base: 0.5, unit: "bunch" } },
+        { name: "Lemon and Thyme Pork Stuffing (see Stuffing)", text: "1 quantity" },
+        { name: "Onion, cut into wedges", base: 1, unit: "each", item: "onions" },
+      ],
+      method: [
+        "**Preheat** the oven to 220°C / Fan 200°C / Gas 7.",
+        "**Butter under the skin:** loosen the skin over the breast by sliding your fingers between the flesh and skin at the neck end, keeping the skin attached at the cavity end. Spread some of the softened butter over the breast under the skin, then slip the lemon slices and thyme under it too (optional, but a nice addition).",
+        "**Stuff the neck end:** stuff the neck end up to the breast. Secure the loose skin with fine skewers or tuck it underneath. Fill the body cavity with lemon trimmings, herbs and the onion wedges only (see tip). Tie the legs with string for a neat shape and lightly butter the skin.",
+        "**Wrap in foil:** work out the cooking time from the chart below (no need to include the stuffing weight). Lay two large sheets of foil across the roasting tin, big enough to come up and over the bird. Put the turkey on top. If using a meat thermometer, insert it into the thickest part of the thigh. Fold the foil loosely over the turkey, leaving a large air gap between the bird and the foil.",
+        "**Start roasting:** roast for 30 minutes at the high temperature.",
+        "**Slow roast:** reduce the oven to 160°C / Fan 140°C / Gas 3 and roast for 2½–3 hours, basting now and then.",
+        "**Brown:** turn the oven back up to 220°C / Fan 200°C / Gas 7. Take the turkey out, fold back the foil and drain off any surplus juices into a jug (save them for the gravy). Baste the bird and return it to the oven for about 30 minutes to brown and crisp the skin.",
+        "**Check it's cooked:** it's done when a meat thermometer in the thickest part of the thigh reads 75–80°C. Without a thermometer, pierce the thickest part of the thigh with a small sharp knife: the juices should run clear. If they're still pink, roast a little longer.",
+        "**Rest:** once the skin is brown, cover the bird again with the foil and leave to stand for 30 minutes before carving.",
+        "**Serve** with pigs in blankets, turkey gravy, bread sauce and apricot and chestnut stuffing.",
+      ],
+      chart: {
+        title: "Gas and electric cooking chart",
+        head: ["Oven-ready turkey", "Start (foil on) 220°C / Fan 200°C / Gas 7", "Roast (foil on) 160°C / Fan 140°C / Gas 3", "Brown (foil open) 220°C / Fan 200°C / Gas 7"],
+        rows: [
+          ["3.5–5 kg (8–11 lb)", "30 mins", "2½–3 hours", "about 30 mins"],
+          ["5.4–6.3 kg (12–14 lb)", "40 mins", "3–3½ hours", "about 30 mins"],
+          ["6.75–9 kg (15–20 lb)", "45 mins", "3½–4½ hours", "about 30 mins"],
+        ],
+        note: "Ovens vary a lot, so if yours runs hot or cool, adjust the times. Allow the 30 minutes' resting time when planning when the bird goes in.",
+      },
+      makeAhead: [
+        "Prepare up to the end of step 4 up to 12 hours ahead. Cover and chill until ready to cook.",
+        "The stuffing can be made up to a month ahead and frozen.",
+      ],
+      tip: "Don't put a meat stuffing in the body cavity, as it isn't safe. Use only flavouring vegetables and herbs there.",
+    },
+
+    nutroast: {
+      title: "Nut Roast",
+      mainIsRecipe: true,
+      heat: "Grill, then oven: 200°C / Fan 180°C / Gas 6",
+      equipment: "900 g (2 lb) loaf tin, about 17 × 9 × 9 cm base, lined with foil and lightly oiled",
+      ingredients: [
+        { name: "Aubergine, medium", base: 1, unit: "each", item: "aubergine" },
+        { name: "Olive oil", text: "for brushing", item: "oliveoil" },
+        { name: "Salt and freshly ground black pepper", text: "to taste", items: ["salt", "pepper"] },
+        { name: "Butter", base: 40, unit: "g", item: "butter" },
+        { name: "Onion, small, finely chopped", base: 1, unit: "each", item: "onions" },
+        { name: "Celery sticks, finely chopped", base: 2, unit: "each", item: "celery" },
+        { name: "Garlic clove, crushed", base: 1, unit: "clove", item: "garlic" },
+        { name: "Shelled mixed nuts (e.g. Brazils, pine nuts, blanched whole almonds), chopped in the processor but not too finely", base: 175, unit: "g", item: "mixednuts" },
+        { name: "Shelled pistachio nuts, roughly chopped", base: 50, unit: "g", item: "pistachios" },
+        { name: "Fresh white breadcrumbs", base: 100, unit: "g", item: "breadcrumbs" },
+        { name: "Lemon, grated rind and juice", base: 0.5, unit: "each", item: "lemon" },
+        { name: "Mature Cheddar, grated", base: 100, unit: "g", item: "cheddar" },
+        { name: "Frozen chestnuts, thawed and roughly chopped", base: 100, unit: "g", item: "chestnuts" },
+        { name: "Eggs, beaten", base: 2, unit: "each", item: "eggs" },
+        { name: "Fresh parsley, chopped", base: 4, unit: "tbsp", item: "parsley", shop: { base: 0.5, unit: "bunch" } },
+        { name: "Sprigs of fresh flat-leaf parsley", text: "to serve", item: "parsley" },
+        { name: "Hot Italian tomato sauce", text: "to serve", item: "tomatosauce" },
+      ],
+      notes: ["No frozen chestnuts? Soak 50 g (2 oz) dried chestnuts overnight instead."],
+      method: [
+        "**Preheat** the grill, and the oven to 200°C / Fan 180°C / Gas 6. Line the loaf tin with foil and oil lightly.",
+        "**Grill the aubergine:** slice thinly lengthways and lay in a single layer on a large oiled baking tray. Brush with oil and season. Grill for 5–7 minutes each side until softened and starting to turn golden. Don't let them brown too much, as they colour more in the oven. The second side cooks faster, so watch it. Leave to cool slightly.",
+        "**Line the tin:** use the aubergine slices to line the base and sides of the tin, all running the same way.",
+        "**Soften the veg:** melt the butter in a medium pan, add the onion, celery and garlic and cook for about 10 minutes until soft, stirring now and then. Tip into a large bowl and leave to cool.",
+        "**Mix:** add all the remaining ingredients to the bowl with plenty of seasoning and stir well.",
+        "**Fill:** spoon into the tin and press down firmly. Fold the ends of the aubergine over the top and cover the tin with foil.",
+        "**Bake** for 50 minutes to 1 hour.",
+        "**Serve:** turn out onto a serving plate, peel off the foil and garnish with parsley. Slice thickly and serve with hot Italian tomato sauce.",
+      ],
+      makeAhead: [
+        "Prepare the day before up to the end of step 6, keep in the fridge, then bake as above.",
+        "Or cook it completely up to 2 days ahead.",
+        "Freezes well: turn out, cool, wrap and freeze for up to 1 month.",
+        "To reheat, put the loaf on a baking tray, cover with foil and heat at 180°C / Fan 160°C / Gas 4 for 50 minutes to 1 hour until piping hot all the way through.",
+      ],
+      tip: "Leftovers are good served cold with chutney and salad. Meat eaters tend to love it too.",
+    },
+
+    sprouts: {
+      title: "Buttered Brussels Sprouts",
+      heat: "Hob only",
+      ingredients: [
+        { name: "Brussels sprouts", base: 900, unit: "g", item: "sprouts" },
+        { name: "Butter", base: 25, unit: "g", item: "butter" },
+        { name: "Salt and freshly ground black pepper", text: "to taste", items: ["salt", "pepper"] },
+      ],
+      method: [
+        "**Prepare:** remove the outer leaves and trim the base of each sprout and cut a cross in the base.",
+        "**Boil:** cook in boiling salted water for 5–6 minutes (depending on size) until just tender, don't let them go soggy.",
+        "**Finish:** drain, add the butter, season and serve straight away.",
+      ],
+      after: ["Sprouts can't be kept hot, so cook them just before serving."],
+      makeAhead: ["Prepare the sprouts the day before, put them in a polythene bag in the fridge."],
+      more: [{ title: "Serving variations", list: [
+        "Stir-fry the cooked sprouts with bacon lardons until the bacon is crisp.",
+        "Serve with toasted almonds or chopped chestnuts for an extra Christmassy feel.",
+      ] }],
+    },
+
+    stuffing: {
+      title: "Stuffing",
+      sections: [
+        {
+          title: "Apricot and Chestnut Stuffing",
+          heat: "Oven: 190°C / Fan 170°C / Gas 5",
+          equipment: "Buttered shallow ovenproof dish, about 23 × 30 × 5 cm",
+          ingredients: [
+            { name: "Ready-to-eat dried apricots", base: 300, unit: "g", item: "apricots" },
+            { name: "Large onion, coarsely chopped", base: 1, unit: "each", item: "onions" },
+            { name: "Fresh white breadcrumbs", base: 300, unit: "g", item: "breadcrumbs" },
+            { name: "Butter, plus extra for greasing", base: 100, unit: "g", item: "butter" },
+            { name: "Frozen chestnuts, thawed and roughly chopped", base: 300, unit: "g", item: "chestnuts" },
+            { name: "Fresh parsley, chopped", text: "a generous bunch", item: "parsley", shop: { base: 1, unit: "bunch" } },
+            { name: "Salt and freshly ground black pepper", text: "to taste", items: ["salt", "pepper"] },
+          ],
+          method: [
+            "**Preheat** the oven to 190°C / Fan 170°C / Gas 5 and butter the dish.",
+            "**Chop** the apricots into raisin-sized pieces.",
+            "**Boil:** bring 800 ml water to the boil in a pan, add the onion and apricots and boil for 5 minutes. Drain well.",
+            "**Butter the crumbs:** put the breadcrumbs in a large bowl. Melt the butter in a non-stick frying pan and pour half of it over the breadcrumbs.",
+            "**Brown the chestnuts:** add the chestnuts to the rest of the butter in the pan and brown lightly.",
+            "**Mix:** combine the chestnuts with the apricots, onion, parsley and breadcrumbs. Season well.",
+            "**Bake:** tip into the dish and bake for about 30–35 minutes until crisp.",
+          ],
+          after: ["Cooked in a separate dish rather than inside the bird, so it goes nice and crisp. Good with turkey, goose or chicken."],
+          makeAhead: [
+            "Prepare up to the end of step 6, cover and keep in the fridge for up to 24 hours. Bake as above, allowing a little longer.",
+            "Or bake the day before and reheat until piping hot on the day.",
+            "Or freeze at the end of step 6 for about 1 month.",
+          ],
+          tip: "Buy frozen chestnuts as soon as they appear in the shops (mid-November), as they sell out quickly.",
+        },
+        {
+          title: "Lemon and Thyme Pork Stuffing",
+          heat: "Hob only (then cooked inside the turkey)",
+          ingredients: [
+            { name: "Butter", base: 15, unit: "g", item: "butter" },
+            { name: "Small onion, chopped", base: 0.5, unit: "each", item: "onions" },
+            { name: "Pork sausagemeat", base: 225, unit: "g", item: "sausagemeat" },
+            { name: "Fresh white breadcrumbs", base: 25, unit: "g", item: "breadcrumbs" },
+            { name: "Large lemon, finely grated zest and juice", base: 0.25, unit: "each", item: "lemon" },
+            { name: "Fresh parsley, chopped", base: 1, unit: "tbsp", item: "parsley", shop: { base: 0, unit: "bunch" } },
+            { name: "Fresh thyme, leaves only", text: "from 1–2 sprigs", item: "thyme", shop: { base: 0.25, unit: "bunch" } },
+            { name: "Salt and freshly ground black pepper", text: "to taste", items: ["salt", "pepper"] },
+          ],
+          method: [
+            "**Soften the onion:** melt the butter in a saucepan, add the onion and cook gently for about 10 minutes until soft.",
+            "**Mix:** stir in all the remaining ingredients and mix well. Leave to cool completely before stuffing the turkey.",
+            "**Stuff** the neck end of the turkey (see the Roast Turkey recipe).",
+          ],
+          after: ["Use it only in the neck end, never in the body cavity, as a meat stuffing there isn't safe."],
+          makeAhead: [
+            "Make the day before, cover and keep in the fridge.",
+            "You can stuff the neck end the day before roasting, as long as the bird fits in the fridge.",
+            "Freezes for up to a month.",
+          ],
+          tip: "Whiz a whole loaf into breadcrumbs ahead of Christmas and freeze them. They defrost in minutes and get used in lots of the festive recipes.",
+        },
+      ],
+    },
+
+    pigs: {
+      title: "Pigs in Blankets",
+      heat: "Oven: 190°C / Fan 170°C / Gas 5",
+      ingredients: [
+        { name: "Dry-cured streaky bacon (long rashers)", base: 6, unit: "each", item: "bacon" },
+        { name: "Cocktail sausages (a typical supermarket pack)", base: 18, unit: "each", item: "cocktailsausages" },
+      ],
+      notes: ["Use good-quality smoked or unsmoked streaky bacon; thin, watery bacon won't crisp up. Double the quantities if you want more – they always go fast."],
+      method: [
+        "**Preheat** the oven to 190°C / Fan 170°C / Gas 5.",
+        "**Stretch** each bacon rasher with the back of a knife, then cut each one into three pieces.",
+        "**Wrap** a piece of bacon tightly around each sausage and lay them on a baking tray.",
+        "**Cook** for about 45 minutes until cooked through and crisp.",
+        "**Serve** hot with the roast turkey.",
+      ],
+      makeAhead: [
+        "Prepare up to the end of step 3, cover and keep in the fridge.",
+        "Or freeze the wrapped sausages at the end of step 3. Thaw overnight somewhere cool, then cook as above.",
+      ],
+    },
+
+    breadsauce: {
+      title: "Bread Sauce",
+      heat: "Hob only",
+      ingredients: [
+        { name: "Onion, peeled and quartered", base: 1, unit: "each", item: "onions" },
+        { name: "Cloves", base: 4, unit: "each", item: "wholecloves" },
+        { name: "Bay leaves", base: 2, unit: "each", item: "bayleaf" },
+        { name: "Milk", base: 450, unit: "ml", item: "milk" },
+        { name: "Fresh white breadcrumbs", base: 100, unit: "g", item: "breadcrumbs" },
+        { name: "Double cream", base: 150, unit: "ml", item: "cream" },
+        { name: "Butter", base: 25, unit: "g", item: "butter" },
+        { name: "Salt and freshly ground black pepper", text: "to taste", items: ["salt", "pepper"] },
+        { name: "Freshly grated nutmeg", text: "a little", item: "nutmeg" },
+      ],
+      method: [
+        "**Infuse:** push a clove into each onion quarter. Put in a pan with the bay leaves and milk, bring to the boil, then take off the heat, cover and leave for about 10 minutes.",
+        "**Remove aromatics:** lift out the onion and bay leaves with a slotted spoon and throw them away.",
+        "**Thicken:** add the breadcrumbs, bring back to the boil while stirring, then simmer for 1–2 minutes.",
+        "**Finish:** stir in the cream and butter, then season with salt, pepper and nutmeg.",
+        "**Serve** hot.",
+      ],
+      makeAhead: [
+        "Unless you're freezing it, make it on the day, otherwise it tends to turn grey.",
+        "Freezes well for up to 1 month. Thaw overnight at room temperature.",
+        "To reheat, put it in a small pan, gradually whisk in a little milk until smooth and the right consistency, and warm gently.",
+      ],
+      tip: "Freeze crust crumbs and non-crust crumbs separately: crust crumbs suit stuffings, and the soft crumbs are good for bread sauce or a gratin topping.",
+    },
+
+    gravy: {
+      title: "Christmas Turkey Gravy",
+      heat: "Hob (made in the turkey roasting tin)",
+      ingredients: [
+        { name: "Turkey fat (from the roasting tin)", base: 2, unit: "tbsp" },
+        { name: "Plain flour", base: 25, unit: "g", item: "flour" },
+        { name: "Giblet stock", base: 600, unit: "ml", item: "stock" },
+        { name: "Port (or red wine)", base: 150, unit: "ml", item: "port" },
+        { name: "Redcurrant jelly", base: 2, unit: "tbsp", item: "redcurrantjelly" },
+        { name: "Skimmed turkey roasting juices", text: "all of them" },
+        { name: "Salt and freshly ground black pepper", text: "to taste", items: ["salt", "pepper"] },
+      ],
+      method: [
+        "**Separate the juices:** pour the turkey juices into a jug. Spoon 2 tbsp of the fat that floats on top back into the unwashed roasting tin, then skim off and discard the rest of the fat.",
+        "**Make the roux:** put the tin over a medium heat, add the flour and cook for about 1 minute, stirring and scraping up the sediment.",
+        "**Add liquid:** gradually whisk in the stock and port.",
+        "**Simmer:** add the redcurrant jelly, bring to the boil, then simmer for 2–3 minutes.",
+        "**Finish:** add the skimmed turkey juices and adjust the seasoning.",
+        "**Serve:** strain into a warmed gravy boat.",
+      ],
+      makeAhead: [
+        "Make the gravy the day before using 2 tbsp vegetable oil instead of turkey fat.",
+        "On the day, drain the fat from the turkey roasting tin, add the gravy to the sediment in the tin, bring to the boil and strain before serving.",
+      ],
+      tip: "If your family likes lots of gravy, double the recipe. Leftovers can go into a soup made from the turkey bones.",
+    },
   };
 
   // ---- Shopping list data ---------------------------------------------------------------------------------
   // ITEMS: every thing you might buy. cat = the shop section. note = a short buying hint.
   // eachG = grams in one whole item, so "350 g onions" in a recipe adds up with "2 onions" elsewhere.
   const CUPBOARD = "Store cupboard";
-  const SHOP_CATS = ["The main dish", "Fruit & veg", "Meat & fish", "Dairy & eggs", "Bakery", CUPBOARD, "Your extras"];
+  const SHOP_CATS = ["The main dish", "Fruit & veg", "Meat & fish", "Dairy & eggs", "Bakery", "Frozen", CUPBOARD, "Your extras"];
   const ITEMS = {
     potatoes:     { name: "Potatoes (Maris Piper, King Edward or Désirée)", cat: "Fruit & veg" },
     parsnips:     { name: "Parsnips", cat: "Fruit & veg" },
@@ -563,20 +821,33 @@
     onions:       { name: "Onions", cat: "Fruit & veg", eachG: 175 },
     apples:       { name: "Cooking apples", cat: "Fruit & veg" },
     garlic:       { name: "Garlic", cat: "Fruit & veg", note: "one bulb is plenty" },
-    sausagemeat:  { name: "Sausagemeat", cat: "Meat & fish" },
-    pigs:         { name: "Pigs in blankets", cat: "Meat & fish" },
+    lemon:        { name: "Lemons", cat: "Fruit & veg" },
+    thyme:        { name: "Fresh thyme", cat: "Fruit & veg" },
+    parsley:      { name: "Fresh parsley (flat-leaf or curly)", cat: "Fruit & veg" },
+    aubergine:    { name: "Aubergine", cat: "Fruit & veg" },
+    celery:       { name: "Celery sticks", cat: "Fruit & veg", note: "from one head" },
+    sausagemeat:  { name: "Pork sausagemeat", cat: "Meat & fish" },
+    bacon:        { name: "Dry-cured streaky bacon (long rashers)", cat: "Meat & fish" },
+    cocktailsausages: { name: "Cocktail sausages", cat: "Meat & fish" },
     butter:       { name: "Butter", cat: "Dairy & eggs" },
     milk:         { name: "Milk", cat: "Dairy & eggs" },
+    cream:        { name: "Double cream", cat: "Dairy & eggs" },
     cheddar:      { name: "Mature Cheddar", cat: "Dairy & eggs" },
     eggs:         { name: "Eggs", cat: "Dairy & eggs", note: "large" },
     breadcrumbs:  { name: "Fresh white breadcrumbs (or white bread to blitz)", cat: "Bakery" },
+    chestnuts:    { name: "Frozen chestnuts", cat: "Frozen", note: "buy early, they sell out" },
     goosefat:     { name: "Goose fat", cat: CUPBOARD },
     oliveoil:     { name: "Olive oil", cat: CUPBOARD },
     vegoil:       { name: "Vegetable oil or beef dripping", cat: CUPBOARD },
     flour:        { name: "Plain flour", cat: CUPBOARD },
-    stock:        { name: "Stock (turkey, chicken or beef)", cat: CUPBOARD, note: "or stock cubes" },
+    stock:        { name: "Giblet stock (or turkey or chicken stock)", cat: CUPBOARD, note: "or stock cubes" },
+    port:         { name: "Port (or red wine)", cat: CUPBOARD },
+    redcurrantjelly: { name: "Redcurrant jelly", cat: CUPBOARD },
+    apricots:     { name: "Ready-to-eat dried apricots", cat: CUPBOARD },
+    mixednuts:    { name: "Shelled mixed nuts (Brazils, pine nuts, almonds)", cat: CUPBOARD },
+    pistachios:   { name: "Shelled pistachio nuts", cat: CUPBOARD },
+    tomatosauce:  { name: "Italian tomato sauce", cat: CUPBOARD, note: "to serve" },
     mustard:      { name: "English mustard", cat: CUPBOARD },
-    sage:         { name: "Dried sage", cat: CUPBOARD },
     cinnamon:     { name: "Ground cinnamon", cat: CUPBOARD },
     groundcloves: { name: "Ground cloves", cat: CUPBOARD },
     wholecloves:  { name: "Whole cloves", cat: CUPBOARD, note: "for the bread sauce onion" },
@@ -588,10 +859,9 @@
     pepper:       { name: "Black pepper", cat: CUPBOARD },
   };
   // Ingredients for sides that have no full recipe above. Amounts are for 8 people (guide quantities).
-  // Sides with a recipe (rid) use that recipe's ingredients instead.
+  // Sides with a recipe (rid) use that recipe's ingredients instead, and so does the main dish when its preset has a recipe.
   const SHOPDATA = {
     roastcarrots: [ { item: "carrots", base: 800, unit: "g" }, { item: "oliveoil", base: 2, unit: "tbsp" }, { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
-    sprouts:      [ { item: "sprouts", base: 800, unit: "g" }, { item: "butter", base: 25, unit: "g" }, { item: "salt", text: "to taste" } ],
     carrots:      [ { item: "carrots", base: 800, unit: "g" }, { item: "butter", base: 15, unit: "g" }, { item: "salt", text: "to taste" } ],
     broccoli:     [ { item: "broccoli", base: 640, unit: "g" }, { item: "salt", text: "to taste" } ],
     peas:         [ { item: "peas", base: 480, unit: "g" } ],
@@ -600,20 +870,18 @@
                     { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
     mash:         [ { item: "potatoes", base: 1600, unit: "g" }, { item: "butter", base: 100, unit: "g" }, { item: "milk", base: 100, unit: "ml" },
                     { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
-    stuffing:     [ { item: "sausagemeat", base: 500, unit: "g" }, { item: "onions", base: 2, unit: "each" }, { item: "breadcrumbs", base: 100, unit: "g" },
-                    { item: "sage", base: 2, unit: "tsp" }, { item: "butter", base: 25, unit: "g" }, { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
-    pigs:         [ { item: "pigs", base: 16, unit: "each" } ],
     yorkies:      [ { item: "flour", base: 200, unit: "g" }, { item: "eggs", base: 5, unit: "each" }, { item: "milk", base: 300, unit: "ml" },
                     { item: "vegoil", base: 4, unit: "tbsp" }, { item: "salt", text: "to taste" } ],
-    breadsauce:   [ { item: "milk", base: 600, unit: "ml" }, { item: "onions", base: 1, unit: "each" }, { item: "wholecloves", base: 6, unit: "each" },
-                    { item: "bayleaf", base: 2, unit: "each" }, { item: "breadcrumbs", base: 100, unit: "g" }, { item: "butter", base: 25, unit: "g" },
-                    { item: "nutmeg", base: 0.125, unit: "nutmeg" }, { item: "salt", text: "to taste" } ],
-    gravy:        [ { item: "flour", base: 30, unit: "g" }, { item: "stock", base: 600, unit: "ml" }, { item: "salt", text: "to taste" }, { item: "pepper", text: "to taste" } ],
   };
 
   // Guide timings (UK-style). perkg = minutes per kg, extra = fixed minutes, rest = resting minutes.
   const PRESETS = [
-    { id: "turkey",  label: "Turkey (whole)",       dish: "Turkey",       w: 5.5, perkg: 20, extra: 70, rest: 45, oven: 180, per: 0.45, temp: "Check the thickest part of the thigh reaches 75 °C and the juices run clear." },
+    { id: "turkey",  rid: "turkey", label: "Turkey (whole)",       dish: "Turkey",       w: 5.5, perkg: 25, extra: 125, rest: 45, oven: 200, per: 0.45, temp: "Check the thickest part of the thigh reaches 75 to 80 °C and the juices run clear.",
+      // The recipe: 30 min hot with the foil on, a long slow roast, then the last 30 min hot with the foil off (fan temperatures).
+      stages: [
+        { after: 30, oven: 140, name: "Turn the oven down to 140\u00B0C", note: "Slow roast with the foil on, basting now and then." },
+        { beforeEnd: 30, oven: 200, name: "Uncover the turkey and turn the oven up to 200\u00B0C", note: "Drain the surplus juices into a jug for the gravy, baste, then back in for about 30 minutes to brown the skin." },
+      ] },
     { id: "crown",   label: "Turkey crown",         dish: "Turkey crown", w: 2.5, perkg: 20, extra: 20, rest: 30, oven: 180, per: 0.4, temp: "Check the thickest part reaches 75 °C and the juices run clear." },
     { id: "goose",   label: "Goose",                dish: "Goose",        w: 4.5, perkg: 33, extra: 15, rest: 30, oven: 180, per: 0.55, temp: "Check the thickest part of the thigh reaches 75 °C. Pour off the fat during cooking." },
     { id: "chicken", label: "Chicken (whole)",      dish: "Chicken",      w: 1.8, perkg: 40, extra: 20, rest: 15, oven: 190, per: 0.35, temp: "Check the thickest part of the thigh reaches 75 °C and the juices run clear." },
@@ -623,7 +891,7 @@
     { id: "lamb",    label: "Leg of lamb, medium",  dish: "Lamb",         w: 2.2, perkg: 55, extra: 25, rest: 30, oven: 190, per: 0.35, temp: "Core temperature about 60 °C for medium." },
     { id: "pork",    label: "Roast pork joint",     dish: "Pork",         w: 2,   perkg: 70, extra: 35, rest: 25, oven: 180, per: 0.35, temp: "Core temperature at least 70 °C, and the juices should run clear." },
     { id: "salmon",  label: "Whole salmon or side", dish: "Salmon",       w: 2,   perkg: 15, extra: 15, rest: 10, oven: 180, per: 0.2, temp: "Flesh should flake easily and be opaque, about 60 °C at the thickest point." },
-    { id: "nut",     label: "Nut roast (fixed time)", dish: "Nut roast",  w: 1,   perkg: 0,  extra: 60, rest: 10, oven: 180, per: 0.25, temp: "Check it is piping hot all the way through." },
+    { id: "nut",     rid: "nutroast", label: "Nut roast (fixed time)", dish: "Nut roast",  w: 1,   perkg: 0,  extra: 60, rest: 10, oven: 180, per: 0.25, temp: "Check it is piping hot all the way through." },
     { id: "custom",  label: "Something else",       dish: "Main",         w: 2,   perkg: 30, extra: 30, rest: 20, oven: 180, per: 0.3, temp: "Check it is cooked through before serving." },
   ];
 
@@ -717,10 +985,16 @@
     const { kg, cook, fixed } = dishMinutes();
     const dish = dishName();
     const rest = Math.max(0, num("rest", 45));
+    const pr = PRESETS.find(x => x.id === $("preset").value);
+    const mrid = pr && pr.rid && RECIPES[pr.rid] ? pr.rid : null;
     const items = [];
     if (cook > 0) {
-      items.push({ name: dish + " into the oven", note: "Cooks for " + fmtDur(cook) + (($("mainnote").value || "").trim() ? "\n" + $("mainnote").value.trim() : ""), recipe: ($("mainrecipe").value || "").trim(), oven: Number($("ovenc").value) || 0, before: cook + rest, key: true });
-      items.push({ name: dish + " out to rest", note: "Cover loosely with foil. Turn the oven up for the roasties.", before: rest, key: true });
+      items.push({ name: dish + " into the oven", note: "Cooks for " + fmtDur(cook) + (($("mainnote").value || "").trim() ? "\n" + $("mainnote").value.trim() : ""), recipe: ($("mainrecipe").value || "").trim(), rid: mrid, oven: Number($("ovenc").value) || 0, before: cook + rest, key: true });
+      items.push({ name: dish + " out to rest", note: pr && pr.stages ? "Cover with the foil and leave to stand before carving." : "Cover loosely with foil. Turn the oven up for the roasties.", rid: mrid, before: rest, key: true });
+      if (pr && pr.stages && cook >= 90) {
+        pr.stages.forEach(st => items.push({ name: st.name, note: st.note, rid: mrid, oven: st.oven, stage: true, heat: true,
+          before: st.after != null ? cook + rest - st.after : rest + st.beforeEnd }));
+      }
     }
     SIDES.forEach(g => g.items.forEach(side => {
       if (!side.on) return;
@@ -733,6 +1007,7 @@
       let cur = null;
       items.filter(i => i.oven > 0).sort((a, b) => b.before - a.before).forEach(i => {
         if (i.oven === cur) return;
+        if (i.stage) { cur = i.oven; return; }
         const verb = cur === null ? "Turn the oven on to " : (i.oven > cur ? "Turn the oven up to " : "Turn the oven down to ");
         items.push({ name: verb + i.oven + "\u00B0C", note: "Ready for: " + i.name.charAt(0).toLowerCase() + i.name.slice(1), before: i.before + warm, heat: true });
         cur = i.oven;
@@ -811,6 +1086,7 @@
     return (w ? String(w) : (e ? "" : "0")) + FR[e];
   }
   function fmtQty(ing, f) {
+    if (ing.mainWeight) { const w = num("weight", 0); return w > 0 ? Number(w.toFixed(1)) + " " + $("unit").value : "your weight"; }
     if (ing.base == null) return ing.text || "";
     const vals = [].concat(ing.base).map(b => b * f);
     let out, label;
@@ -818,13 +1094,20 @@
       const v = vals[0];
       if (v >= 1000) { out = String(parseFloat((Math.round(v / 50) * 50 / 1000).toFixed(2))); label = "kg"; }
       else { out = String(v < 100 ? Math.max(1, Math.round(v)) : Math.round(v / 5) * 5); label = "g"; }
+    } else if (ing.unit === "ml") {
+      const v = vals[0];
+      if (v >= 1000) { out = String(parseFloat((Math.round(v / 50) * 50 / 1000).toFixed(2))); label = "L"; }
+      else { out = String(Math.max(5, Math.round(v / 5) * 5)); label = "ml"; }
+    } else if (ing.unit === "each") {
+      out = vals.map(v => fmtFrac(v >= 3 ? Math.round(v) : Math.max(0.25, Math.round(v * 4) / 4))).join("–");
+      label = "";
     } else {
       const U = UNITS[ing.unit];
       const snap = v => Math.max(U.step, Math.round(v / U.step) * U.step);
-      out = vals.map(v => fmtFrac(snap(v))).join("\u2013");
+      out = vals.map(v => fmtFrac(snap(v))).join("–");
       label = U.many ? (snap(vals[vals.length - 1]) > 1 ? U.many : U.one) : U.label;
     }
-    return (ing.pre || "") + out + " " + label;
+    return ((ing.pre || "") + out + " " + label).trim();
   }
 
   // ---- Shopping list ---------------------------------------------------------------------------------------
@@ -844,6 +1127,7 @@
         return [fmtFrac(Math.max(st, Math.round(v / st) * st)), unit];
       }
       if (unit === "each") return [String(Math.max(1, Math.ceil(v - 1e-9))), ""];
+      if (unit === "bunch") { const n = Math.max(1, Math.ceil(v - 1e-9)); return [String(n), n === 1 ? "bunch" : "bunches"]; }
       if (unit === "clove") { const n = Math.max(1, Math.ceil(v - 1e-9)); return [String(n), n === 1 ? "clove" : "cloves"]; }
       if (unit === "nutmeg") { const n = Math.max(1, Math.ceil(v - 1e-9)); return [String(n), n === 1 ? "whole nutmeg" : "whole nutmegs"]; }
       return [String(v), unit];
@@ -855,7 +1139,9 @@
   }
 
   function sideIngredients(side) {
-    return side.rid && RECIPES[side.rid] ? RECIPES[side.rid].ingredients : (SHOPDATA[side.id] || []);
+    const r = side.rid && RECIPES[side.rid];
+    if (!r) return SHOPDATA[side.id] || [];
+    return r.sections ? r.sections.reduce((all, sec) => all.concat(sec.ingredients), []) : r.ingredients;
   }
 
   // Adds up every ingredient for the main dish and the ticked sides into one list, merging the same item.
@@ -873,17 +1159,25 @@
       l.lo += lo; l.hi += hi;
       if (src && l.from.indexOf(src) < 0) l.from.push(src);
     }
+    function addIng(ing, src) {
+      const keys = ing.items || (ing.item ? [ing.item] : []);
+      if (!keys.length) return;                       // nothing to buy (for example fat from the roasting tin)
+      const base = ing.shop ? ing.shop.base : ing.base;
+      if (base == null) { keys.forEach(k => add(k, null, 0, 0, src)); return; }
+      const b = [].concat(base);
+      let lo = b[0] * f, hi = b[b.length - 1] * f, unit = ing.shop ? ing.shop.unit : ing.unit;
+      const eg = ITEMS[ing.item] && ITEMS[ing.item].eachG;
+      if (unit === "g" && eg) { lo /= eg; hi /= eg; unit = "each"; }
+      add(ing.item, unit, lo, hi, src);
+    }
     SIDES.forEach(g => g.items.forEach(side => {
       if (!side.on) return;
-      sideIngredients(side).forEach(ing => {
-        if (ing.base == null) { (ing.items || [ing.item]).forEach(k => add(k, null, 0, 0, side.name)); return; }
-        const b = [].concat(ing.base);
-        let lo = b[0] * f, hi = b[b.length - 1] * f, unit = ing.unit;
-        const eg = ITEMS[ing.item] && ITEMS[ing.item].eachG;
-        if (unit === "g" && eg) { lo /= eg; hi /= eg; unit = "each"; }
-        add(ing.item, unit, lo, hi, side.name);
-      });
+      sideIngredients(side).forEach(ing => addIng(ing, side.name));
     }));
+    // The main dish: if its preset has a recipe, that recipe's ingredients go on the list too.
+    const mp = PRESETS.find(x => x.id === $("preset").value);
+    const mr = mp && mp.rid ? RECIPES[mp.rid] : null;
+    if (mr) mr.ingredients.forEach(ing => addIng(ing, dishName()));
     const haveQty = new Set();
     lines.forEach(l => { if (l.unit) haveQty.add(l.item); });
     const out = [];
@@ -893,7 +1187,7 @@
       out.push(l);
     });
     const w = num("weight", 0);
-    if (w > 0) out.push({ key: "main", rkey: "main", name: dishName(), cat: "The main dish", note: "", from: [], qty: Number(w.toFixed(1)) + " " + $("unit").value });
+    if (w > 0 && !(mr && mr.mainIsRecipe)) out.push({ key: "main", rkey: "main", name: dishName(), cat: "The main dish", note: "", from: [], qty: Number(w.toFixed(1)) + " " + $("unit").value });
     extras.forEach(x => out.push({ key: "x" + x.id, rkey: "x" + x.id, name: x.name, cat: "Your extras", note: "", from: [], qty: x.qty, extra: true }));
     out.sort((a, b) => SHOP_CATS.indexOf(a.cat) - SHOP_CATS.indexOf(b.cat) || a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
     return out;
@@ -997,19 +1291,42 @@
   }
 
   // ---- Recipe screen -------------------------------------------------------------------------
+  // The body of one recipe: hd is "h2" for a single recipe, "h3" for a recipe inside a multi-recipe screen.
+  function recipeBody(r, f, hd) {
+    const T = t => "<" + hd + ">" + esc2(t) + "</" + hd + ">";
+    let h = T("Ingredients") + '<ul class="ing">' + r.ingredients.map(g => '<li><span class="q">' + esc2(fmtQty(g, f)) + "</span><span>" + esc2(g.name) + "</span></li>").join("") + "</ul>";
+    (r.notes || []).forEach(t => { h += "<p>" + md(t) + "</p>"; });
+    h += T("Method") + '<ol class="method">' + r.method.map(t => "<li>" + md(t) + "</li>").join("") + "</ol>";
+    (r.after || []).forEach(t => { h += "<p>" + md(t) + "</p>"; });
+    if (r.chart) {
+      h += T(r.chart.title) + '<div class="rv-tablewrap"><table class="rv-table"><thead><tr>' + r.chart.head.map(c => "<th>" + esc2(c) + "</th>").join("") + "</tr></thead><tbody>"
+        + r.chart.rows.map(row => "<tr>" + row.map(c => "<td>" + esc2(c) + "</td>").join("") + "</tr>").join("") + "</tbody></table></div>";
+      if (r.chart.note) h += "<p>" + md(r.chart.note) + "</p>";
+    }
+    if (r.makeAhead && r.makeAhead.length) {
+      h += T("Make ahead") + (r.makeAhead.length > 1 ? '<ul class="plain">' + r.makeAhead.map(t => "<li>" + md(t) + "</li>").join("") + "</ul>" : "<p>" + md(r.makeAhead[0]) + "</p>");
+    }
+    if (r.tip) h += T("Tip") + "<p>" + md(r.tip) + "</p>";
+    (r.more || []).forEach(m => { h += T(m.title) + '<ul class="plain">' + m.list.map(t => "<li>" + md(t) + "</li>").join("") + "</ul>"; });
+    if (r.serveWith) h += T("Serve with") + "<p>" + md(r.serveWith) + "</p>";
+    return h;
+  }
+
   function renderRecipe(rid) {
     const r = RECIPES[rid], n = people(), f = n / 8;
     const steps = lastPlan ? lastPlan.items.filter(i => i.rid === rid) : [];
+    const heat = x => x.heat || ("Oven: " + x.oven);
     let h = '<h1 id="rv-title">' + esc2(r.title) + "</h1>";
-    h += '<p class="rv-meta">Serves ' + n + (n === 8 ? "" : " (scaled from 8)") + " \u00B7 Oven: " + esc2(r.oven) + (r.equipment ? " \u00B7 " + esc2(r.equipment) : "") + "</p>";
-    if (steps.length) h += '<div class="rv-box"><b>Where it fits in your plan</b><ul>' + steps.map(s => "<li>" + esc2(fmtWhen(s.when)) + " \u2013 " + esc2(s.name) + "</li>").join("") + "</ul></div>";
-    h += "<h2>Ingredients</h2><ul class=\"ing\">" + r.ingredients.map(g => '<li><span class="q">' + esc2(fmtQty(g, f)) + "</span><span>" + esc2(g.name) + "</span></li>").join("") + "</ul>";
-    h += '<h2>Method</h2><ol class="method">' + r.method.map(s => "<li>" + md(s) + "</li>").join("") + "</ol>";
-    if (r.makeAhead && r.makeAhead.length) {
-      h += "<h2>Make ahead</h2>" + (r.makeAhead.length > 1 ? '<ul class="plain">' + r.makeAhead.map(s => "<li>" + md(s) + "</li>").join("") + "</ul>" : "<p>" + md(r.makeAhead[0]) + "</p>");
+    h += '<p class="rv-meta">Serves ' + n + (n === 8 ? "" : " (scaled from 8)")
+      + (r.sections ? " · " + r.sections.length + " recipes" : " · " + esc2(heat(r)) + (r.equipment ? " · " + esc2(r.equipment) : "")) + "</p>";
+    if (steps.length) h += '<div class="rv-box"><b>Where it fits in your plan</b><ul>' + steps.map(s => "<li>" + esc2(fmtWhen(s.when)) + " – " + esc2(s.name) + "</li>").join("") + "</ul></div>";
+    if (r.sections) {
+      r.sections.forEach(sec => {
+        h += '<section class="rv-sec"><h2>' + esc2(sec.title) + '</h2><p class="rv-meta">' + esc2(heat(sec)) + (sec.equipment ? " · " + esc2(sec.equipment) : "") + "</p>" + recipeBody(sec, f, "h3") + "</section>";
+      });
+    } else {
+      h += recipeBody(r, f, "h2");
     }
-    if (r.tip) h += "<h2>Tip</h2><p>" + md(r.tip) + "</p>";
-    if (r.serveWith) h += "<h2>Serve with</h2><p>" + md(r.serveWith) + "</p>";
     $("rv-body").innerHTML = h;
   }
 
