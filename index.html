@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Special meal planner, version 3.4 (25 Nov 2026). Version history is in the script. -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
@@ -113,6 +114,7 @@
   .chip:has(input:focus-visible) { outline: 3px solid var(--pine); outline-offset: 2px; }
   .hint { font-size: 14px; color: var(--muted); margin: 0 0 14px; }
   .howto { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  .version { text-align: center; font-size: 12px; color: var(--muted); margin: 28px 0 0; }
   .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: #fff;
     padding: 10px 16px; border-radius: 8px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; }
   .toast.show { opacity: 1; }
@@ -276,7 +278,7 @@
 
   <section class="noprint" aria-labelledby="h-to">
     <h2 id="h-to">Time Outs</h2>
-    <p class="hint">A Time Out tells you how long you have until your next task, so you can put your feet up. Choose the shortest gap that counts as a break, and the plan adds up to two. The gaps below are counted from when you finish the task before, so set how long that usually takes.</p>
+    <p class="hint">A Time Out tells you how long you have until your next task, so you can put your feet up, or go to the pub! Choose the shortest gap that counts as a break, and the plan adds up to two. The gaps below are counted from when you finish the task before, so set how long that usually takes.</p>
     <div class="row">
       <div>
         <label for="tmmin">Shortest gap for a Time Out</label>
@@ -383,6 +385,7 @@
       <p class="hint" style="margin-top:14px">Timings are a guide. Always check with a thermometer before serving.</p>
     </details>
   </section>
+  <p class="version noprint" id="version"></p>
 </main>
 
 <main id="recipeview" hidden aria-labelledby="rv-title">
@@ -406,6 +409,14 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script>
+  // Version history. Bump APP_VERSION and add a line here each time the page is changed.
+  //   3.0  shopping list (merged, removable items, copy and print)
+  //   3.1  fixed "Post how great this app is on Social Media!" task halfway down the timeline
+  //   3.2  ten built-in recipes, linked from the timeline; shopping list uses the recipe ingredients
+  //   3.3  turkey oven stages and cooking time from the recipe; pigs in blankets 45 min at 190\u00B0C
+  //   3.4  "Braised red cabbage" name; Time Out wording; version number shown
+  const APP_VERSION = "3.4", APP_DATE = "25 Nov 2026";
+
   // Sides and extras. Each step happens a set number of minutes before eating. {dish} becomes the main dish name.
   // per: guide quantity per person - {amt, unit, label}. unit "" = whole items, "g" grams, "ml" millilitres.
   // rid: id of the built-in recipe (see RECIPES) that the step links to.
@@ -420,7 +431,7 @@
       { id: "carrots", name: "Boiled carrots", per: { amt: 100, unit: "g", label: "carrots" }, steps: [ { name: "Carrots on to boil", mins: 15 } ] },
       { id: "broccoli", name: "Broccoli", per: { amt: 80, unit: "g", label: "broccoli" }, steps: [ { name: "Broccoli on to steam", mins: 8 } ] },
       { id: "peas", name: "Peas or green beans", per: { amt: 60, unit: "g", label: "peas or beans" }, steps: [ { name: "Peas or beans on to cook", mins: 6 } ] },
-      { id: "cabbage", rid: "cabbage", name: "Red cabbage", per: { amt: 100, unit: "g", label: "red cabbage" }, steps: [ { name: "Red cabbage on to braise", mins: 150 } ] },
+      { id: "cabbage", rid: "cabbage", name: "Braised red cabbage", per: { amt: 100, unit: "g", label: "red cabbage" }, steps: [ { name: "Red cabbage on to braise", mins: 150 } ] },
       { id: "cauli", name: "Cauliflower cheese", per: { amt: 150, unit: "g", label: "cauliflower" }, steps: [
         { name: "Make the cauliflower cheese", mins: 75 }, { name: "Cauliflower cheese into the oven", mins: 30 } ] },
       { id: "mash", name: "Mashed potato", per: { amt: 200, unit: "g", label: "potatoes" }, steps: [
@@ -1794,6 +1805,7 @@
   const t = new Date(); t.setDate(t.getDate() + 1); t.setHours(18, 0, 0, 0);
   $("serve").value = t.getFullYear() + "-" + pad(t.getMonth() + 1) + "-" + pad(t.getDate()) + "T18:00";
 
+  $("version").textContent = "Version " + APP_VERSION + " \u00B7 " + APP_DATE;
   applyOccasion();
   renderSides();
   applyPreset();
